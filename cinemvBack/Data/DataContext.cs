@@ -8,7 +8,7 @@ public class cinemvBackContext : DbContext
     public DbSet<Avis> Avis { get; set; } = null!;
     public DbSet<Favoris> Favoris { get; set; } = null!;
     public DbSet<Genre> Genres { get; set; } = null!;
-    public DbSet<ListeFilms> ListeFilms { get; set; } = null!;
+    public DbSet<ListeFilms> ListesFilms { get; set; } = null!;
     public DbSet<Note> Notes { get; set; } = null!;
 
     public string DbPath { get; private set; }

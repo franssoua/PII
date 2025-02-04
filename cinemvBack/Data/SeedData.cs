@@ -8,7 +8,7 @@ public static class SeedData
     {
         using var context = new cinemvBackContext();
 
-        if (context.Utilisateurs.Any() || context.ListeFilms.Any())
+        if (context.Utilisateurs.Any() || context.ListesFilms.Any())
         {
             return;
         }
@@ -19,7 +19,7 @@ public static class SeedData
             NomUtilisateur = "Axelle",
             Email = "aagez@ensc.fr",
             MotDePasse = "pdw12345",
-            DateInscription = DateTime.Now,
+            DateInscription = DateTime.Parse("2025-01-11"),
         };
 
         Utilisateur utilisateur2 = new()
@@ -27,7 +27,7 @@ public static class SeedData
             NomUtilisateur = "Elliot",
             Email = "egreneche@ensc.fr",
             MotDePasse = "potin54321",
-            DateInscription = DateTime.Now,
+            DateInscription = DateTime.Parse("2024-12-21"),
         };
 
         context.Utilisateurs.AddRange(utilisateur1, utilisateur2);
@@ -59,7 +59,7 @@ public static class SeedData
             FilmsIds = new List<string> { "tt0050083", "tt0073486", "tt0038650" },
         };
 
-        context.ListeFilms.AddRange(liste1, liste2, liste3);
+        context.ListesFilms.AddRange(liste1, liste2, liste3);
 
         context.SaveChanges();
 

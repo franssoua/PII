@@ -10,4 +10,25 @@ public class ListeFilms
     public ICollection<string> FilmsIds { get; set; } = new List<string>();
 
     public ListeFilms() { }
+
+    public void ModifierListe(string nouveauTitre, string nouvelleDescription)
+    {
+        Titre = nouveauTitre;
+        Description = nouvelleDescription;
+    }
+
+    public bool AjouterFilm(string filmId)
+    {
+        if (!FilmsIds.Contains(filmId))
+        {
+            FilmsIds.Add(filmId);
+            return true;
+        }
+        return false;
+    }
+
+    public bool SupprimerFilm(string filmId)
+    {
+        return FilmsIds.Remove(filmId);
+    }
 }
