@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -9,9 +10,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace cinemvBack.Migrations
 {
     [DbContext(typeof(cinemvBackContext))]
-    partial class cinemvBackContextModelSnapshot : ModelSnapshot
+    [Migration("20250204142024_FavorisFilmId")]
+    partial class FavorisFilmId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.1");
@@ -26,9 +29,6 @@ namespace cinemvBack.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("SuiviId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("UtilisateurId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");

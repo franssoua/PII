@@ -10,4 +10,13 @@ public class Avis
     public string FilmId { get; set; } = null!;
 
     public Avis() { }
+
+    public Avis(AvisDTO avisDTO)
+    {
+        Id = avisDTO.Id;
+        Contenu = avisDTO.Contenu;
+        DateCreation = avisDTO.DateCreation;
+        UtilisateurId = avisDTO.UtilisateurId;
+        FilmId = avisDTO.FilmId;
+    }
 }

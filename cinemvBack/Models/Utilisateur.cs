@@ -12,7 +12,8 @@ public class Utilisateur
     public ICollection<ListeFilms>? Listes { get; set; }
     public ICollection<Avis>? Avis { get; set; }
     public ICollection<Note>? Notes { get; set; }
-    public ICollection<Utilisateur>? Abonnements { get; set; }
+    public ICollection<Utilisateur> Abonnements { get; set; } = new List<Utilisateur>();
+    public ICollection<string> FavorisFilmsIds { get; set; } = new List<string>();
 
     public Utilisateur() { }
 
@@ -65,5 +66,35 @@ public class Utilisateur
     private static string HashPassword(string motDePasse)
     {
         return BCrypt.HashPassword(motDePasse);
+    }
+
+    public bool AjouterAbonnement(Utilisateur utilisateur)
+    {
+        if (!Abonnements.Contains(utilisateur))
+        {
+            Abonnements.Add(utilisateur);
+            return true;
+        }
+        return false;
+    }
+
+    public bool SupprimerAbonnement(Utilisateur utilisateur)
+    {
+        return Abonnements.Remove(utilisateur);
+    }
+
+    public bool AjouterFilmFavoris(string filmId)
+    {
+        if (!FavorisFilmsIds.Contains(filmId))
+        {
+            FavorisFilmsIds.Add(filmId);
+            return true;
+        }
+        return false;
+    }
+
+    public bool SupprimerFilmFavoris(string filmId)
+    {
+        return FavorisFilmsIds.Remove(filmId);
     }
 }
