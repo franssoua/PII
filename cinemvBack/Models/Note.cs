@@ -10,4 +10,13 @@ public class Note
     public string FilmId { get; set; } = null!;
 
     public Note() { }
+
+    public Note(NoteDTO noteDTO)
+    {
+        Id = noteDTO.Id;
+        Valeur = noteDTO.Valeur;
+        DateCreation = noteDTO.DateCreation;
+        UtilisateurId = noteDTO.UtilisateurId;
+        FilmId = noteDTO.FilmId;
+    }
 }
