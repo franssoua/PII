@@ -100,12 +100,31 @@ public class UtilisateurController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var utilisateur = await _context.Utilisateurs.FindAsync(id);
+        var utilisateur = await _context
+            .Utilisateurs.Include(u => u.Listes) // Inclure les films liés à l'utilisateur
+            .Include(u => u.Abonnements) // Inclure les abonnements
+            .FirstOrDefaultAsync(u => u.Id == id);
 
         if (utilisateur == null)
         {
             return NotFound("Utilisateur non trouvé.");
         }
+
+        var abonnements = await _context
+            .Utilisateurs.Where(u => u.Abonnements.Contains(utilisateur))
+            .ToListAsync();
+
+        foreach (var abonne in abonnements)
+        {
+            abonne.Abonnements.Remove(utilisateur);
+            _context.Utilisateurs.Update(abonne);
+        }
+
+        var listesFilms = await _context
+            .ListesFilms.Where(l => l.UtilisateurId == id)
+            .ToListAsync();
+
+        _context.ListesFilms.RemoveRange(listesFilms);
 
         _context.Utilisateurs.Remove(utilisateur);
         await _context.SaveChangesAsync();

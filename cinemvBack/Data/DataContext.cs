@@ -13,7 +13,8 @@ public class cinemvBackContext : DbContext
 
     public string DbPath { get; private set; }
 
-    public cinemvBackContext()
+    public cinemvBackContext(DbContextOptions<cinemvBackContext> options)
+        : base(options)
     {
         // Path to SQLite database file
         DbPath = "cinemvBack.db";

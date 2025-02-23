@@ -1,24 +1,30 @@
+using System;
+using System.Linq;
 using cinemvBack.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace cinemvBack.Data;
 
 public static class SeedData
 {
-    public static void Init()
+    public static void Init(IServiceProvider serviceProvider)
     {
-        using var context = new cinemvBackContext();
+        using var context = new cinemvBackContext(
+            serviceProvider.GetRequiredService<DbContextOptions<cinemvBackContext>>()
+        );
 
-        if (context.Utilisateurs.Any() || context.ListesFilms.Any())
-        {
-            return;
-        }
+        // if (context.Utilisateurs.Any() || context.ListesFilms.Any())
+        // {
+        //     return;
+        // }
 
         //Ajout d’éléments de la première classe
         Utilisateur utilisateur1 = new()
         {
             NomUtilisateur = "Axelle",
             Email = "aagez@ensc.fr",
-            MotDePasse = "pdw12345",
+            MotDePasse = BCrypt.Net.BCrypt.HashPassword("pdw12345"),
             DateInscription = DateTime.Parse("2025-01-11"),
         };
 
@@ -26,11 +32,20 @@ public static class SeedData
         {
             NomUtilisateur = "Elliot",
             Email = "egreneche@ensc.fr",
-            MotDePasse = "potin54321",
+            MotDePasse = BCrypt.Net.BCrypt.HashPassword("potin54321"),
             DateInscription = DateTime.Parse("2024-12-21"),
         };
 
-        context.Utilisateurs.AddRange(utilisateur1, utilisateur2);
+        Utilisateur utilisateur3 = new()
+        {
+            NomUtilisateur = "admin",
+            Email = "admin@ensc.fr",
+            MotDePasse = BCrypt.Net.BCrypt.HashPassword("admin"),
+            IsAdmin = true,
+            DateInscription = DateTime.Parse("2025-02-21"),
+        };
+
+        context.Utilisateurs.AddRange(utilisateur1, utilisateur2, utilisateur3);
 
         context.SaveChanges();
 
