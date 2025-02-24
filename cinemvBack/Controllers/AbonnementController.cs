@@ -1,4 +1,6 @@
+using System.Security.Claims;
 using cinemvBack.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -38,9 +40,25 @@ public class AbonnementController : ControllerBase
     }
 
     [HttpPost("ajouter")]
+    [Authorize]
     public async Task<IActionResult> AjouterAbonnement(AbonnementDTO abonnementDTO)
     {
-        var abonne = await _context.Utilisateurs.FindAsync(abonnementDTO.SuiveurId);
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim == null)
+        {
+            return Unauthorized(
+                new { message = "Vous devez être connecté pour vous abonner à un utilisateur." }
+            );
+        }
+
+        int userId = int.Parse(userIdClaim.Value);
+
+        if (abonnementDTO.SuiveurId != userId)
+        {
+            return Forbid();
+        }
+
+        var abonne = await _context.Utilisateurs.FindAsync(userId);
         var abonnement = await _context.Utilisateurs.FindAsync(abonnementDTO.SuiviId);
 
         if (abonne == null || abonnement == null)
@@ -54,13 +72,29 @@ public class AbonnementController : ControllerBase
             return Ok("Abonnement ajouté avec succès.");
         }
 
-        return BadRequest("L'utilisateur est déjà abonné.");
+        return BadRequest("Vous êtes déjà abonné à cet utilisateur.");
     }
 
     [HttpDelete("supprimer")]
+    [Authorize]
     public async Task<IActionResult> SupprimerAbonnement(AbonnementDTO abonnementDTO)
     {
-        var abonne = await _context.Utilisateurs.FindAsync(abonnementDTO.SuiveurId);
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim == null)
+        {
+            return Unauthorized(
+                new { message = "Vous devez être connecté pour vous désabonner d'un utilisateur." }
+            );
+        }
+
+        int userId = int.Parse(userIdClaim.Value);
+
+        if (abonnementDTO.SuiveurId != userId)
+        {
+            return Forbid();
+        }
+
+        var abonne = await _context.Utilisateurs.FindAsync(userId);
         var abonnement = await _context.Utilisateurs.FindAsync(abonnementDTO.SuiviId);
 
         if (abonne == null || abonnement == null)
@@ -74,6 +108,6 @@ public class AbonnementController : ControllerBase
             return Ok("Abonnement supprimé avec succès.");
         }
 
-        return BadRequest("L'utilisateur n'était pas abonné.");
+        return BadRequest("Vous n'étiez pas abonné à cet utilisateur.");
     }
 }

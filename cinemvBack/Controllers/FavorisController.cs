@@ -1,4 +1,6 @@
+using System.Security.Claims;
 using cinemvBack.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -31,9 +33,18 @@ public class FavorisController : ControllerBase
     }
 
     [HttpPost("ajouter")]
+    [Authorize]
     public async Task<IActionResult> AjouterFilmFavoris(FavorisDTO favorisDTO)
     {
-        var utilisateur = await _context.Utilisateurs.FindAsync(favorisDTO.UtilisateurId);
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim == null)
+        {
+            return Unauthorized("Vous devez être connecté pour ajouter un film à vos favoris.");
+        }
+
+        int userId = int.Parse(userIdClaim.Value);
+
+        var utilisateur = await _context.Utilisateurs.FindAsync(userId);
         if (utilisateur == null)
         {
             return NotFound("Utilisateur non trouvé");
@@ -49,12 +60,29 @@ public class FavorisController : ControllerBase
     }
 
     [HttpDelete("supprimer")]
+    [Authorize]
     public async Task<IActionResult> SupprimerFilmFavoris(FavorisDTO favorisDTO)
     {
-        var utilisateur = await _context.Utilisateurs.FindAsync(favorisDTO.UtilisateurId);
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim == null)
+        {
+            return Unauthorized(
+                new { message = "Vous devez être connecté pour supprimer un film de vos favoris." }
+            );
+        }
+
+        int userId = int.Parse(userIdClaim.Value);
+        bool isAdmin = User.IsInRole("Admin");
+
+        var utilisateur = await _context.Utilisateurs.FindAsync(userId);
         if (utilisateur == null)
         {
             return NotFound("Utilisateur non trouvé");
+        }
+
+        if (favorisDTO.UtilisateurId != userId && !isAdmin)
+        {
+            return Forbid();
         }
 
         if (utilisateur.SupprimerFilmFavoris(favorisDTO.FilmId))

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace cinemvBack.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class Reset2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -34,7 +34,9 @@ namespace cinemvBack.Migrations
                     NomUtilisateur = table.Column<string>(type: "TEXT", nullable: false),
                     Email = table.Column<string>(type: "TEXT", nullable: false),
                     MotDePasse = table.Column<string>(type: "TEXT", nullable: false),
+                    IsAdmin = table.Column<bool>(type: "INTEGER", nullable: false),
                     DateInscription = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    FavorisFilmsIds = table.Column<string>(type: "TEXT", nullable: false),
                     UtilisateurId = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
@@ -74,7 +76,7 @@ namespace cinemvBack.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Commentaires",
+                name: "Avis",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
@@ -86,9 +88,9 @@ namespace cinemvBack.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Commentaires", x => x.Id);
+                    table.PrimaryKey("PK_Avis", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Commentaires_Utilisateurs_UtilisateurId",
+                        name: "FK_Avis_Utilisateurs_UtilisateurId",
                         column: x => x.UtilisateurId,
                         principalTable: "Utilisateurs",
                         principalColumn: "Id",
@@ -116,7 +118,7 @@ namespace cinemvBack.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ListeFilms",
+                name: "ListesFilms",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
@@ -128,9 +130,9 @@ namespace cinemvBack.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ListeFilms", x => x.Id);
+                    table.PrimaryKey("PK_ListesFilms", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ListeFilms_Utilisateurs_UtilisateurId",
+                        name: "FK_ListesFilms_Utilisateurs_UtilisateurId",
                         column: x => x.UtilisateurId,
                         principalTable: "Utilisateurs",
                         principalColumn: "Id",
@@ -170,8 +172,8 @@ namespace cinemvBack.Migrations
                 column: "SuiviId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Commentaires_UtilisateurId",
-                table: "Commentaires",
+                name: "IX_Avis_UtilisateurId",
+                table: "Avis",
                 column: "UtilisateurId");
 
             migrationBuilder.CreateIndex(
@@ -180,8 +182,8 @@ namespace cinemvBack.Migrations
                 column: "UtilisateurId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ListeFilms_UtilisateurId",
-                table: "ListeFilms",
+                name: "IX_ListesFilms_UtilisateurId",
+                table: "ListesFilms",
                 column: "UtilisateurId");
 
             migrationBuilder.CreateIndex(
@@ -202,7 +204,7 @@ namespace cinemvBack.Migrations
                 name: "Abonnements");
 
             migrationBuilder.DropTable(
-                name: "Commentaires");
+                name: "Avis");
 
             migrationBuilder.DropTable(
                 name: "Favoris");
@@ -211,7 +213,7 @@ namespace cinemvBack.Migrations
                 name: "Genres");
 
             migrationBuilder.DropTable(
-                name: "ListeFilms");
+                name: "ListesFilms");
 
             migrationBuilder.DropTable(
                 name: "Notes");

@@ -26,6 +26,20 @@ builder
             ValidateAudience = false,
             ClockSkew = TimeSpan.Zero,
         };
+
+        options.Events = new JwtBearerEvents // pas sur de garder à voir
+        {
+            OnChallenge = context =>
+            {
+                context.HandleResponse();
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                context.Response.ContentType = "application/json";
+                var result = System.Text.Json.JsonSerializer.Serialize(
+                    new { message = "Veuillez vous connecter pour poursuivre." }
+                );
+                return context.Response.WriteAsync(result);
+            },
+        };
     });
 
 builder.Services.AddAuthorization();

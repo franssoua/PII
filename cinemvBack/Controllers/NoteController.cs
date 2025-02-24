@@ -1,3 +1,5 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -51,9 +53,26 @@ public class NoteController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize]
     public async Task<IActionResult> AjouterNote(NoteDTO noteDTO)
     {
-        var utilisateur = await _context.Utilisateurs.FindAsync(noteDTO.UtilisateurId);
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim == null)
+        {
+            return Unauthorized("Vous devez être connecté pour poster un avis.");
+        }
+
+        int userId = int.Parse(userIdClaim.Value);
+        bool isAdmin = User.IsInRole("Admin");
+
+        if (noteDTO.UtilisateurId != userId && !isAdmin)
+        {
+            return StatusCode(
+                StatusCodes.Status403Forbidden,
+                "Vous n'avez pas le droit d'ajouter un avis pour un autre utilisateur."
+            );
+        }
+        var utilisateur = await _context.Utilisateurs.FindAsync(userId);
         if (utilisateur == null)
         {
             return NotFound("Utilisateur non trouvé.");
@@ -79,12 +98,30 @@ public class NoteController : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize]
     public async Task<IActionResult> ModifierNote(int id, NoteDTO noteDTO)
     {
         var note = await _context.Notes.FindAsync(id);
         if (note == null)
         {
             return NotFound("Note introuvable.");
+        }
+
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim == null)
+        {
+            return Unauthorized("Utilisateur non authentifié.");
+        }
+
+        int userId = int.Parse(userIdClaim.Value);
+        bool isAdmin = User.IsInRole("Admin");
+
+        if (note.UtilisateurId != userId && !isAdmin)
+        {
+            return StatusCode(
+                StatusCodes.Status403Forbidden,
+                "Vous n'avez pas le droit de modifier cette note."
+            );
         }
 
         if (noteDTO.Valeur < 0 || noteDTO.Valeur > 5)
@@ -99,12 +136,30 @@ public class NoteController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize]
     public async Task<IActionResult> SupprimerNote(int id)
     {
         var note = await _context.Notes.FindAsync(id);
         if (note == null)
         {
             return NotFound("Note introuvable.");
+        }
+
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim == null)
+        {
+            return Unauthorized("Utilisateur non authentifié.");
+        }
+
+        int userId = int.Parse(userIdClaim.Value);
+        bool isAdmin = User.IsInRole("Admin");
+
+        if (note.UtilisateurId != userId && !isAdmin)
+        {
+            return StatusCode(
+                StatusCodes.Status403Forbidden,
+                "Vous n'avez pas le droit de supprimer cette note."
+            );
         }
 
         _context.Notes.Remove(note);

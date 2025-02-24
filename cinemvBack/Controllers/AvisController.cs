@@ -1,3 +1,5 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -51,9 +53,27 @@ public class AvisController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize]
     public async Task<IActionResult> AjouterAvis(AvisDTO avisDTO)
     {
-        var utilisateur = await _context.Utilisateurs.FindAsync(avisDTO.UtilisateurId);
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim == null)
+        {
+            return Unauthorized("Vous devez être connecté pour poster une note.");
+        }
+
+        int userId = int.Parse(userIdClaim.Value);
+        bool isAdmin = User.IsInRole("Admin");
+
+        if (avisDTO.UtilisateurId != userId && !isAdmin)
+        {
+            return StatusCode(
+                StatusCodes.Status403Forbidden,
+                "Vous n'avez pas le droit d'ajouter une note pour un autre utilisateur."
+            );
+        }
+
+        var utilisateur = await _context.Utilisateurs.FindAsync(userId);
         if (utilisateur == null)
         {
             return NotFound("Utilisateur non trouvée.");
@@ -74,12 +94,30 @@ public class AvisController : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize]
     public async Task<IActionResult> ModifierAvis(int id, AvisDTO avisDTO)
     {
         var avis = await _context.Avis.FindAsync(id);
         if (avis == null)
         {
-            return NotFound();
+            return NotFound("Avis introuvable.");
+        }
+
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim == null)
+        {
+            return Unauthorized("Utilisateur non authentifié.");
+        }
+
+        int userId = int.Parse(userIdClaim.Value);
+        bool isAdmin = User.IsInRole("Admin");
+
+        if (avis.UtilisateurId != userId && !isAdmin)
+        {
+            return StatusCode(
+                StatusCodes.Status403Forbidden,
+                "Vous n'avez pas le droit de modifier cet avis."
+            );
         }
 
         avis.Contenu = avisDTO.Contenu;
@@ -89,12 +127,30 @@ public class AvisController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize]
     public async Task<IActionResult> SupprimerAvis(int id)
     {
         var avis = await _context.Avis.FindAsync(id);
         if (avis == null)
         {
             return NotFound("Avis introuvable.");
+        }
+
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim == null)
+        {
+            return Unauthorized("Utilisateur non authentifié.");
+        }
+
+        int userId = int.Parse(userIdClaim.Value);
+        bool isAdmin = User.IsInRole("Admin");
+
+        if (avis.UtilisateurId != userId && !isAdmin)
+        {
+            return StatusCode(
+                StatusCodes.Status403Forbidden,
+                "Vous n'avez pas le droit de supprimer cet avis."
+            );
         }
 
         _context.Avis.Remove(avis);

@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace cinemvBack.Migrations
 {
     [DbContext(typeof(cinemvBackContext))]
-    [Migration("20250204142024_FavorisFilmId")]
-    partial class FavorisFilmId
+    [Migration("20250223144621_Reset2")]
+    partial class Reset2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -175,6 +175,9 @@ namespace cinemvBack.Migrations
                     b.PrimitiveCollection<string>("FavorisFilmsIds")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsAdmin")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("MotDePasse")
                         .IsRequired()
