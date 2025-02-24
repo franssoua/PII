@@ -1,4 +1,6 @@
+using System.Security.Claims;
 using cinemvBack.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,10 +10,18 @@ namespace cinemvBack.Controllers;
 [Route("api/utilisateur")]
 public class UtilisateurController : ControllerBase
 {
+    private readonly JwtService _jwtService;
+    private readonly ILogger<UtilisateurController> _logger;
     private readonly cinemvBackContext _context;
 
-    public UtilisateurController(cinemvBackContext context)
+    public UtilisateurController(
+        JwtService jwtService,
+        ILogger<UtilisateurController> logger,
+        cinemvBackContext context
+    )
     {
+        _jwtService = jwtService;
+        _logger = logger;
         _context = context;
     }
 
@@ -31,6 +41,14 @@ public class UtilisateurController : ControllerBase
             return NotFound("Utilisateur non trouvé.");
 
         return new UtilisateurDTO(utilisateur);
+    }
+
+    [HttpGet("isadmin")]
+    [Authorize]
+    public IActionResult IsAdmin()
+    {
+        var isAdmin = User.IsInRole("Admin");
+        return Ok(new { isAdmin });
     }
 
     [HttpPost("register")]
@@ -54,34 +72,60 @@ public class UtilisateurController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login(LoginDTO loginDTO)
+    public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginDTO loginDTO)
     {
-        var utilisateur = await _context.Utilisateurs.FirstOrDefaultAsync(u =>
-            u.Email == loginDTO.Email
-        );
-
-        if (utilisateur == null || !utilisateur.VerifyPassword(loginDTO.MotDePasse))
+        if (loginDTO == null)
         {
-            return Unauthorized("Email ou mot de passe incorrect.");
+            return BadRequest("La requête ne peut pas être nulle.");
         }
 
-        return Ok(
-            new
+        try
+        {
+            var utilisateur = await _context.Utilisateurs.FirstOrDefaultAsync(u =>
+                u.Email == loginDTO.Email
+            );
+
+            if (utilisateur == null)
             {
-                Message = "Connexion réussie.",
-                Utilisateur = new
-                {
-                    utilisateur.Id,
-                    utilisateur.NomUtilisateur,
-                    utilisateur.Email,
-                },
+                return Unauthorized("Identifiants invalides.");
             }
-        );
+
+            if (!utilisateur.VerifyPassword(loginDTO.MotDePasse))
+            {
+                return Unauthorized("Identifiants invalides.");
+            }
+
+            var token = _jwtService.GenerateToken(utilisateur);
+
+            return Ok(new AuthResponse { Token = token, Utilisateur = utilisateur });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Erreur lors de la connexion.");
+            return StatusCode(500, "Erreur interne du serveur.");
+        }
     }
 
     [HttpPut("{id}")]
+    [Authorize]
     public async Task<IActionResult> Update(int id, UpdateUtilisateurDTO updateUtilisateurDTO)
     {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        var isAdmin = User.IsInRole("Admin");
+
+        if (userIdClaim == null)
+        {
+            return Unauthorized(
+                new { message = "Vous devez être connecté pour modifier votre compte." }
+            );
+        }
+
+        int userId = int.Parse(userIdClaim.Value);
+        if (userId != id && !isAdmin)
+        {
+            return Forbid();
+        }
+
         var utilisateur = await _context.Utilisateurs.FindAsync(id);
 
         if (utilisateur == null)
@@ -98,8 +142,25 @@ public class UtilisateurController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize]
     public async Task<IActionResult> Delete(int id)
     {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        var isAdmin = User.IsInRole("Admin");
+
+        if (userIdClaim == null)
+        {
+            return Unauthorized(
+                new { message = "Vous devez être connecté pour supprimer votre compte." }
+            );
+        }
+
+        int userId = int.Parse(userIdClaim.Value);
+        if (userId != id && !isAdmin)
+        {
+            return Forbid();
+        }
+
         var utilisateur = await _context
             .Utilisateurs.Include(u => u.Listes) // Inclure les films liés à l'utilisateur
             .Include(u => u.Abonnements) // Inclure les abonnements

@@ -1,4 +1,6 @@
+using System.Security.Claims;
 using cinemvBack.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -34,9 +36,23 @@ public class ListeFilmsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize]
     public async Task<IActionResult> CreateList(ListeFilmsDTO listeFilmsDTO)
     {
-        var utilisateur = await _context.Utilisateurs.FindAsync(listeFilmsDTO.UtilisateurId);
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim == null)
+        {
+            return Unauthorized(new { message = "Vous devez être connecté pour créer une liste." });
+        }
+
+        int userId = int.Parse(userIdClaim.Value);
+
+        if (listeFilmsDTO.UtilisateurId != userId)
+        {
+            return Forbid();
+        }
+
+        var utilisateur = await _context.Utilisateurs.FindAsync(userId);
         if (utilisateur == null)
         {
             return BadRequest("Utilisateur inexistant.");
@@ -62,27 +78,59 @@ public class ListeFilmsController : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize]
     public async Task<IActionResult> UpdateList(int id, [FromBody] ListeFilmsDTO listeFilmsDTO)
     {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim == null)
+        {
+            return Unauthorized(
+                new { message = "Vous devez être connecté pour modifier une liste." }
+            );
+        }
+
+        int userId = int.Parse(userIdClaim.Value);
         var listeFilms = await _context.ListesFilms.FindAsync(id);
+
         if (listeFilms == null)
         {
             return NotFound("Liste non trouvée.");
         }
 
+        if (listeFilms.UtilisateurId != userId)
+        {
+            return Forbid();
+        }
+
         listeFilms.ModifierListe(listeFilmsDTO.Titre, listeFilmsDTO.Description);
         await _context.SaveChangesAsync();
 
-        return Ok("Liste mise à jour avec succès."); //essayer après avec Ok("Liste modifiée avec succès.")
+        return Ok("Liste mise à jour avec succès.");
     }
 
     [HttpDelete("{id}")]
+    [Authorize]
     public async Task<IActionResult> DeleteList(int id)
     {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim == null)
+        {
+            return Unauthorized(
+                new { message = "Vous devez être connecté pour supprimer une liste." }
+            );
+        }
+
+        int userId = int.Parse(userIdClaim.Value);
         var listeFilms = await _context.ListesFilms.FindAsync(id);
+
         if (listeFilms == null)
         {
             return NotFound("Liste non trouvée.");
+        }
+
+        if (listeFilms.UtilisateurId != userId)
+        {
+            return Forbid();
         }
 
         _context.ListesFilms.Remove(listeFilms);
@@ -92,12 +140,28 @@ public class ListeFilmsController : ControllerBase
     }
 
     [HttpPost("{id}/ajouterFilm")]
+    [Authorize]
     public async Task<IActionResult> AjouterFilm(int id, [FromBody] string filmId)
     {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim == null)
+        {
+            return Unauthorized(
+                new { message = "Vous devez être connecté pour ajouter un film à une liste." }
+            );
+        }
+
+        int userId = int.Parse(userIdClaim.Value);
         var listeFilms = await _context.ListesFilms.FindAsync(id);
+
         if (listeFilms == null)
         {
             return NotFound("Liste non trouvée.");
+        }
+
+        if (listeFilms.UtilisateurId != userId)
+        {
+            return Forbid();
         }
 
         if (!listeFilms.AjouterFilm(filmId))
@@ -110,12 +174,28 @@ public class ListeFilmsController : ControllerBase
     }
 
     [HttpPost("{id}/supprimerFilm")]
+    [Authorize]
     public async Task<IActionResult> SupprimerFilm(int id, [FromBody] string filmId)
     {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim == null)
+        {
+            return Unauthorized(
+                new { message = "Vous devez être connecté pour supprimer un film d'une liste." }
+            );
+        }
+
+        int userId = int.Parse(userIdClaim.Value);
         var listeFilms = await _context.ListesFilms.FindAsync(id);
+
         if (listeFilms == null)
         {
             return NotFound("Liste non trouvée.");
+        }
+
+        if (listeFilms.UtilisateurId != userId)
+        {
+            return Forbid();
         }
 
         if (!listeFilms.SupprimerFilm(filmId))
