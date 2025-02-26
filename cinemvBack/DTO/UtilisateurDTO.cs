@@ -43,11 +43,11 @@ public class RegisterDTO
 
 public class LoginDTO
 {
-    [JsonPropertyName("Email")]
+    // [JsonPropertyName("Email")]
     public string Email { get; set; } = null!;
 
-    [JsonPropertyName("Mot de passe")]
-    public string MotDePasse { get; set; } = null!;
+    // [JsonPropertyName("Mot de passe")]
+    public string Password { get; set; } = null!;
 }
 
 public class UpdateUtilisateurDTO

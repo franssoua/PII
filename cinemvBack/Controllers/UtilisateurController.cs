@@ -90,7 +90,7 @@ public class UtilisateurController : ControllerBase
                 return Unauthorized("Identifiants invalides.");
             }
 
-            if (!utilisateur.VerifyPassword(loginDTO.MotDePasse))
+            if (!utilisateur.VerifyPassword(loginDTO.Password))
             {
                 return Unauthorized("Identifiants invalides.");
             }
@@ -123,7 +123,9 @@ public class UtilisateurController : ControllerBase
         int userId = int.Parse(userIdClaim.Value);
         if (userId != id && !isAdmin)
         {
-            return Forbid();
+            return Forbid(
+                "Vous n'avez pas la permission de modifier les informations de cet utilisateur."
+            );
         }
 
         var utilisateur = await _context.Utilisateurs.FindAsync(id);
@@ -158,7 +160,7 @@ public class UtilisateurController : ControllerBase
         int userId = int.Parse(userIdClaim.Value);
         if (userId != id && !isAdmin)
         {
-            return Forbid();
+            return Forbid("Vous n'avez pas la permission de supprimer cet utilisateur.");
         }
 
         var utilisateur = await _context

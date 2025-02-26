@@ -32,7 +32,7 @@ public class NoteController : ControllerBase
         var notes = await _context.Notes.Where(a => a.FilmId == filmId).ToListAsync();
         if (notes.Count == 0)
         {
-            return NotFound("Ce film n'a aucun avis pour le moment.");
+            return NotFound("Ce film n'a aucune note pour le moment.");
         }
         var noteDTO = notes.Select(a => new NoteDTO(a)).ToList();
 
@@ -45,7 +45,7 @@ public class NoteController : ControllerBase
         var notes = await _context.Notes.Where(a => a.UtilisateurId == utilisateurId).ToListAsync();
         if (notes.Count == 0)
         {
-            return NotFound("Cet utilisateur n'a posté aucun commentaires.");
+            return NotFound("Cet utilisateur n'a posté aucune note.");
         }
         var noteDTO = notes.Select(a => new NoteDTO(a)).ToList();
 
@@ -69,7 +69,7 @@ public class NoteController : ControllerBase
         {
             return StatusCode(
                 StatusCodes.Status403Forbidden,
-                "Vous n'avez pas le droit d'ajouter un avis pour un autre utilisateur."
+                "Vous n'avez pas le droit d'ajouter une note pour un autre utilisateur."
             );
         }
         var utilisateur = await _context.Utilisateurs.FindAsync(userId);

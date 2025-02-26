@@ -47,10 +47,14 @@ Console.WriteLine("JWT Key: " + builder.Configuration["Jwt:Key"]);
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(
-        "AllowAllOrigins",
+        "AllowLocalhost3000",
         policy =>
         {
-            policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+            policy
+                .WithOrigins("http://localhost:3000") // Autorise le frontend
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials();
         }
     );
 });
@@ -109,7 +113,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseRouting();
-app.UseCors("AllowAllOrigins");
+app.UseCors("AllowLocalhost3000");
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseEndpoints(endpoints =>

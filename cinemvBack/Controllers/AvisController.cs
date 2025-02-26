@@ -59,7 +59,7 @@ public class AvisController : ControllerBase
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
         if (userIdClaim == null)
         {
-            return Unauthorized("Vous devez être connecté pour poster une note.");
+            return Unauthorized("Vous devez être connecté pour poster un avis.");
         }
 
         int userId = int.Parse(userIdClaim.Value);
@@ -69,7 +69,7 @@ public class AvisController : ControllerBase
         {
             return StatusCode(
                 StatusCodes.Status403Forbidden,
-                "Vous n'avez pas le droit d'ajouter une note pour un autre utilisateur."
+                "Vous n'avez pas le droit d'ajouter un avis pour un autre utilisateur."
             );
         }
 
