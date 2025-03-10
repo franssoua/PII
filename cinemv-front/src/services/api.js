@@ -13,8 +13,15 @@ export const login = async (email, password) => {
     const response = await api.post(
       "/utilisateur/login",
       { email, password },
-      { headers: { "Content-Type": "application/json" } } // Ajout des headers si besoin
+      { headers: { "Content-Type": "application/json" } } 
     );
+
+    const { Token } = response.data;
+
+    if (Token) {
+      localStorage.setItem("token", Token); 
+    }
+
     return response.data;
   } catch (error) {
     console.error("Erreur de connexion", error);
