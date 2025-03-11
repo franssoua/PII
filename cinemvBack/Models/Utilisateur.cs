@@ -37,7 +37,7 @@ public class Utilisateur
             NomUtilisateur = registerDTO.NomUtilisateur,
             Email = registerDTO.Email,
             MotDePasse = HashPassword(registerDTO.MotDePasse),
-            DateInscription = registerDTO.DateInscription,
+            //DateInscription = registerDTO.DateInscription,
         };
     }
 

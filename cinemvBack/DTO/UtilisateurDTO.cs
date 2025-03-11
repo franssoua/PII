@@ -37,8 +37,8 @@ public class RegisterDTO
     [JsonPropertyName("Mot de passe")]
     public string MotDePasse { get; set; } = null!;
 
-    [JsonPropertyName("Date d'inscription")]
-    public DateTime DateInscription { get; set; }
+    // [JsonPropertyName("Date d'inscription")]
+    // public DateTime DateInscription { get; set; }
 }
 
 public class LoginDTO
