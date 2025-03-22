@@ -1,4 +1,5 @@
 import { useState, useContext } from "react";
+import { TextField, Button, Container, Typography, Box } from "@mui/material";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
@@ -19,26 +20,44 @@ const Login = () => {
   };
 
   return (
-    <div>
-      <h2>Connexion</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Mot de passe"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <button type="submit">Se connecter</button>
-      </form>
-    </div>
+    <Container maxWidth="sm">
+      <Box
+        sx={{ mt: 5, p: 3, boxShadow: 3, borderRadius: 2, bgcolor: "white" }}
+      >
+        <Typography variant="h4" gutterBottom>
+          Connexion
+        </Typography>
+        <form onSubmit={handleSubmit}>
+          <TextField
+            type="email"
+            label="Email"
+            fullWidth
+            margin="normal"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <TextField
+            type="password"
+            label="Mot de passe"
+            fullWidth
+            margin="normal"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            fullWidth
+            sx={{ mt: 2 }}
+          >
+            Se connecter
+          </Button>
+        </form>
+      </Box>
+    </Container>
   );
 };
 

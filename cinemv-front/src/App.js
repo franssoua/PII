@@ -7,6 +7,7 @@ import Movies from "./pages/Movies";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Profile from "./pages/Profile";
+import MovieDetails from "./pages/MovieDetails";
 
 function AppContent() {
   const { user } = useContext(AuthContext);
@@ -25,6 +26,7 @@ function AppContent() {
         <Route path="/register" element={<Register />} />
         <Route path="/movies" element={<Movies />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/movie/:id" element={<MovieDetails />} />
       </Routes>
     </div>
   );

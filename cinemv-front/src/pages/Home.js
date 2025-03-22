@@ -19,9 +19,21 @@ function Home() {
       </Typography>
       <Stack spacing={2} sx={{ maxWidth: 300, margin: "auto" }}>
         {user ? (
-          <Button variant="contained" color="secondary" onClick={logout}>
-            Déconnexion
-          </Button>
+          <>
+            <Button variant="contained" color="secondary" onClick={logout}>
+              Déconnexion
+            </Button>
+            <Link to="/movies">
+              <Button variant="contained" color="primary" fullWidth>
+                Les films
+              </Button>
+            </Link>
+            <Link to="/profile">
+              <Button variant="contained" color="primary" fullWidth>
+                Votre profil
+              </Button>
+            </Link>
+          </>
         ) : (
           <>
             <Link to="/login">
@@ -32,6 +44,11 @@ function Home() {
             <Link to="/register">
               <Button variant="contained" color="primary" fullWidth>
                 S'inscrire
+              </Button>
+            </Link>
+            <Link to="/movies">
+              <Button variant="contained" color="primary" fullWidth>
+                Les films
               </Button>
             </Link>
           </>
