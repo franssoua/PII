@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 public class AvisDTO
 {
     public int Id { get; set; }
@@ -5,6 +7,9 @@ public class AvisDTO
     public DateTime DateCreation { get; set; }
     public int UtilisateurId { get; set; }
     public string FilmId { get; set; } = null!;
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public string? NomUtilisateur { get; set; }
 
     public AvisDTO() { }
 
@@ -15,5 +20,6 @@ public class AvisDTO
         DateCreation = avis.DateCreation;
         UtilisateurId = avis.UtilisateurId;
         FilmId = avis.FilmId;
+        NomUtilisateur = avis.Utilisateur?.NomUtilisateur ?? "Utilisateur inconnu";
     }
 }

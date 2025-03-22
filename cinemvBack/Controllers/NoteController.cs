@@ -29,20 +29,26 @@ public class NoteController : ControllerBase
     [HttpGet("film/{filmId}")]
     public async Task<IActionResult> GetNotesByFilm(string filmId)
     {
-        var notes = await _context.Notes.Where(a => a.FilmId == filmId).ToListAsync();
-        if (notes.Count == 0)
-        {
-            return NotFound("Ce film n'a aucune note pour le moment.");
-        }
-        var noteDTO = notes.Select(a => new NoteDTO(a)).ToList();
+        var notes = await _context
+            .Notes.Include(a => a.Utilisateur)
+            .Where(a => a.FilmId == filmId)
+            .ToListAsync();
+        // if (notes.Count == 0)
+        // {
+        //     return Ok(new List<NoteDTO>());
+        // }
+        // var noteDTO = notes.Select(a => new NoteDTO(a)).ToList();
 
-        return Ok(noteDTO);
+        return Ok(notes.Select(a => new NoteDTO(a)).ToList());
     }
 
     [HttpGet("utilisateur/{utilisateurId}")]
     public async Task<IActionResult> GetNotessByUtilisateur(int utilisateurId)
     {
-        var notes = await _context.Notes.Where(a => a.UtilisateurId == utilisateurId).ToListAsync();
+        var notes = await _context
+            .Notes.Include(a => a.Utilisateur)
+            .Where(a => a.UtilisateurId == utilisateurId)
+            .ToListAsync();
         if (notes.Count == 0)
         {
             return NotFound("Cet utilisateur n'a posté aucune note.");
@@ -64,6 +70,14 @@ public class NoteController : ControllerBase
 
         int userId = int.Parse(userIdClaim.Value);
         bool isAdmin = User.IsInRole("Admin");
+        var existingNote = await _context.Notes.FirstOrDefaultAsync(n =>
+            n.UtilisateurId == userId && n.FilmId == noteDTO.FilmId
+        );
+
+        if (existingNote != null)
+        {
+            return BadRequest("Vous avez déjà noté ce film.");
+        }
 
         if (noteDTO.UtilisateurId != userId && !isAdmin)
         {

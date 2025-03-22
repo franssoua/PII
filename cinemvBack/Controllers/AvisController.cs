@@ -29,7 +29,10 @@ public class AvisController : ControllerBase
     [HttpGet("film/{filmId}")]
     public async Task<IActionResult> GetAvisByFilm(string filmId)
     {
-        var avis = await _context.Avis.Where(a => a.FilmId == filmId).ToListAsync();
+        var avis = await _context
+            .Avis.Include(a => a.Utilisateur)
+            .Where(a => a.FilmId == filmId)
+            .ToListAsync();
         if (avis == null)
         {
             return NotFound("Cet utilisateur n'a posté aucun commentaires.");
@@ -42,7 +45,10 @@ public class AvisController : ControllerBase
     [HttpGet("utilisateur/{utilisateurId}")]
     public async Task<IActionResult> GetAvisByUtilisateur(int utilisateurId)
     {
-        var avis = await _context.Avis.Where(a => a.UtilisateurId == utilisateurId).ToListAsync();
+        var avis = await _context
+            .Avis.Include(a => a.Utilisateur)
+            .Where(a => a.UtilisateurId == utilisateurId)
+            .ToListAsync();
         if (avis == null)
         {
             return NotFound("Cet utilisateur n'a posté aucun commentaires.");
@@ -64,6 +70,14 @@ public class AvisController : ControllerBase
 
         int userId = int.Parse(userIdClaim.Value);
         bool isAdmin = User.IsInRole("Admin");
+        var existingAvis = await _context.Avis.FirstOrDefaultAsync(a =>
+            a.UtilisateurId == userId && a.FilmId == avisDTO.FilmId
+        );
+
+        if (existingAvis != null)
+        {
+            return BadRequest("Vous avez déjà laissé un avis pour ce film.");
+        }
 
         if (avisDTO.UtilisateurId != userId && !isAdmin)
         {
