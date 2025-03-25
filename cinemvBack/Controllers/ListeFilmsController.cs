@@ -121,6 +121,7 @@ public class ListeFilmsController : ControllerBase
         }
 
         int userId = int.Parse(userIdClaim.Value);
+        bool isAdmin = User.IsInRole("Admin");
         var listeFilms = await _context.ListesFilms.FindAsync(id);
 
         if (listeFilms == null)
@@ -128,7 +129,7 @@ public class ListeFilmsController : ControllerBase
             return NotFound("Liste non trouvée.");
         }
 
-        if (listeFilms.UtilisateurId != userId)
+        if (listeFilms.UtilisateurId != userId && !isAdmin)
         {
             return Forbid();
         }

@@ -88,8 +88,9 @@ public class AbonnementController : ControllerBase
         }
 
         int userId = int.Parse(userIdClaim.Value);
+        bool isAdmin = User.IsInRole("Admin");
 
-        if (abonnementDTO.SuiveurId != userId)
+        if (abonnementDTO.SuiveurId != userId && !isAdmin)
         {
             return Forbid();
         }
