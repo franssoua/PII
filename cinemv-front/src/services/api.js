@@ -289,4 +289,19 @@ export const recupererFavoris = async () => {
   }
 };
 
+export const getAvisByUtilisateur = async (utilisateurId) => {
+  try {
+    const response = await axios.get(
+      `${API_URL}/avis/utilisateur/${utilisateurId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Erreur lors de la récupération des avis utilisateur :",
+      error
+    );
+    return [];
+  }
+};
+
 export { api, tmdbApi };
