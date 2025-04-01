@@ -12,8 +12,6 @@ public class ListeFilmsDTO
 
     [JsonPropertyName("Description")]
     public string Description { get; set; } = null!;
-
-    [JsonPropertyName("Id des films de la liste")]
     public List<string> FilmsIds { get; set; } = new List<string>();
 
     public ListeFilmsDTO() { }
