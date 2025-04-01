@@ -1,10 +1,22 @@
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 import {
   getMovieDetails,
   recupererFavoris,
   getAvisByUtilisateur,
+  getNotesByUtilisateur,
   getNotesByFilm,
+  updateAvis,
+  updateNote,
+  deleteAvis,
+  deleteNote,
+  supprimerFavoris,
+  getListesByUtilisateur,
+  createListe,
+  updateListe,
+  deleteListe,
+  supprimerFilm,
 } from "../services/api";
 import {
   Container,
@@ -17,7 +29,9 @@ import {
   Tabs,
   Tab,
   Rating,
+  IconButton,
 } from "@mui/material";
+import { Edit, Delete, Favorite, Remove } from "@mui/icons-material";
 
 function Profile() {
   const { user } = useContext(AuthContext);
@@ -26,6 +40,8 @@ function Profile() {
   const [tabIndex, setTabIndex] = useState(0);
   const [avis, setAvis] = useState([]);
   const [notes, setNotes] = useState([]);
+  const [listes, setListes] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchFavoris = async () => {
@@ -44,41 +60,6 @@ function Profile() {
       }
     };
 
-    const fetchAvis = async () => {
-      if (user) {
-        const avisUtilisateur = await getAvisByUtilisateur(user.id);
-
-        const avisAvecDetails = [];
-
-        for (const a of avisUtilisateur) {
-          if (!a.filmId) continue;
-
-          try {
-            const film = await getMovieDetails(a.filmId);
-            const filmNotes = await getNotesByFilm(a.filmId);
-            const notePourFilm = filmNotes.find(
-              (n) => n.utilisateurId === user.id
-            );
-
-            if (film && film.title) {
-              avisAvecDetails.push({
-                ...a,
-                film,
-                note: notePourFilm?.valeur || null,
-              });
-            }
-          } catch (err) {
-            console.warn(
-              `Film introuvable pour filmId = ${a.filmId} :`,
-              err.message
-            );
-          }
-        }
-
-        setAvis(avisAvecDetails);
-      }
-    };
-
     if (showFavoris) {
       fetchFavoris();
     }
@@ -86,7 +67,153 @@ function Profile() {
     if (tabIndex === 1) {
       fetchAvis();
     }
+
+    if (tabIndex === 2) {
+      fetchListes();
+    }
   }, [tabIndex, showFavoris, user]);
+
+  const fetchAvis = async () => {
+    if (user) {
+      const avisUtilisateur = await getAvisByUtilisateur(user.id);
+      const notesUtilisateur = await getNotesByUtilisateur(user.id);
+
+      const toutFilmIds = [
+        ...new Set([
+          ...avisUtilisateur.map((a) => a.filmId),
+          ...notesUtilisateur.map((n) => n.filmId),
+        ]),
+      ];
+
+      const avisEtNotes = [];
+
+      for (const filmId of toutFilmIds) {
+        try {
+          const film = await getMovieDetails(filmId);
+
+          const avis = avisUtilisateur.find((a) => a.filmId === filmId);
+          const note = notesUtilisateur.find((n) => n.filmId === filmId);
+
+          if (film && film.title) {
+            avisEtNotes.push({
+              id: avis?.id || null,
+              contenu: avis?.contenu || null,
+              dateCreation: avis?.dateCreation || note?.dateCreation || null,
+              film,
+              note: note?.valeur || null,
+              noteId: note?.id || null,
+            });
+          }
+        } catch (err) {
+          console.warn(
+            `Film introuvable pour filmId = ${filmId} :`,
+            err.message
+          );
+        }
+      }
+
+      // Trier du plus récent au plus ancien (optionnel)
+      avisEtNotes.sort(
+        (a, b) => new Date(b.dateCreation) - new Date(a.dateCreation)
+      );
+
+      setAvis(avisEtNotes);
+    }
+  };
+
+  const fetchListes = async () => {
+    if (user) {
+      const toutesListes = await getListesByUtilisateur(user.id);
+      setListes(toutesListes);
+    }
+  };
+
+  const handleUpdateAvis = async (avisId, contenu, utilisateurId, filmId) => {
+    const nouveauContenu = prompt("Modifier votre avis :", contenu);
+    if (nouveauContenu) {
+      await updateAvis(avisId, nouveauContenu, utilisateurId, filmId);
+      await fetchAvis();
+    }
+  };
+
+  const handleUpdateNote = async (noteId, valeur, utilisateurId, filmId) => {
+    const nouvelleValeur = prompt("Modifier votre note :", valeur);
+    const parsedValeur = parseFloat(nouvelleValeur);
+    if (!isNaN(parsedValeur) && parsedValeur >= 0 && parsedValeur <= 5) {
+      await updateNote(noteId, parsedValeur, utilisateurId, String(filmId));
+      await fetchAvis();
+    } else {
+      alert("Veuillez entrer une valeur entre 0 et 5.");
+    }
+  };
+
+  const handleDeleteAvis = async (avisId) => {
+    if (window.confirm("Voulez-vous vraiment supprimer cet avis ?")) {
+      await deleteAvis(avisId);
+      await fetchAvis();
+    }
+  };
+
+  const handleDeleteNote = async (noteId) => {
+    if (window.confirm("Voulez-vous vraiment supprimer cette note ?")) {
+      await deleteNote(noteId);
+      await fetchAvis();
+    }
+  };
+
+  const handleRemoveFavori = async (filmId) => {
+    if (!user) return;
+    await supprimerFavoris(user.id, String(filmId));
+    const allFavoris = await recupererFavoris();
+    const userFavoris = allFavoris.find((f) => f.utilisateurId === user.id);
+    if (userFavoris) {
+      const films = (
+        await Promise.all(
+          userFavoris.favorisFilms.map((filmId) => getMovieDetails(filmId))
+        )
+      ).filter((film) => film !== null);
+      setFavoris(films);
+    } else {
+      setFavoris([]);
+    }
+  };
+
+  const handleUpdateListe = async (liste) => {
+    const nouveauTitre = prompt("Nouveau titre :", liste.titre);
+    const nouvelleDescription = prompt(
+      "Nouvelle description :",
+      liste.description
+    );
+    if (nouveauTitre && nouvelleDescription) {
+      await updateListe(liste.Id, {
+        titre: nouveauTitre,
+        description: nouvelleDescription,
+        utilisateurId: user.id,
+        filmsIds: liste.filmsIds || [],
+      });
+      fetchListes();
+    }
+  };
+
+  const handleDeleteListe = async (listeId) => {
+    if (window.confirm("Voulez-vous vraiment supprimer cette liste ?")) {
+      await deleteListe(listeId);
+      fetchListes();
+    }
+  };
+
+  const handleRemoveFilmFromListe = async (listeId, filmId) => {
+    if (!user) return;
+    const confirm = window.confirm("Supprimer ce film de cette liste ?");
+    if (!confirm) return;
+
+    try {
+      await supprimerFilm(listeId, String(filmId));
+      fetchListes(); // refresh
+    } catch (error) {
+      console.error("Erreur suppression film de la liste :", error);
+    }
+  };
 
   if (!user)
     return (
@@ -109,6 +236,7 @@ function Profile() {
       >
         <Tab label="Favoris" />
         <Tab label="Avis" />
+        <Tab label="Listes" />
       </Tabs>
 
       {tabIndex === 0 && (
@@ -129,13 +257,26 @@ function Profile() {
           ) : (
             favoris.map((film) => (
               <Grid item key={film.id} xs={12} sm={6} md={4} lg={2}>
-                <Card sx={{ maxWidth: 200, mx: "auto" }}>
+                <Card sx={{ maxWidth: 200, mx: "auto", position: "relative" }}>
                   <CardMedia
                     component="img"
                     height="300"
                     image={`https://image.tmdb.org/t/p/w500${film.poster_path}`}
                     alt={film.title}
                   />
+                  <IconButton
+                    sx={{
+                      position: "absolute",
+                      top: 8,
+                      right: 8,
+                      color: "error.main",
+                      backgroundColor: "rgba(255,255,255,0.8)",
+                      borderRadius: "50%",
+                    }}
+                    onClick={() => handleRemoveFavori(film.id)}
+                  >
+                    <Favorite />
+                  </IconButton>
                   <CardContent>
                     <Typography variant="subtitle1">{film.title}</Typography>
                   </CardContent>
@@ -153,7 +294,7 @@ function Profile() {
           ) : (
             avis.map((a) =>
               a.film ? (
-                <Grid item key={a.id} xs={12} sm={6} md={4}>
+                <Grid item key={a.id || a.noteId} xs={12} sm={6} md={4}>
                   <Card sx={{ display: "flex", alignItems: "center", p: 1 }}>
                     <CardMedia
                       component="img"
@@ -169,14 +310,61 @@ function Profile() {
                         {a.contenu}
                       </Typography>
                       {a.note !== null && (
-                        <Rating
-                          value={a.note}
-                          precision={0.5}
-                          readOnly
-                          size="small"
-                          sx={{ mb: 1 }}
-                        />
+                        <>
+                          <Rating
+                            value={a.note}
+                            precision={0.5}
+                            readOnly
+                            size="small"
+                            sx={{ mb: 1 }}
+                          />
+                          <IconButton
+                            size="small"
+                            onClick={() =>
+                              handleUpdateNote(
+                                a.noteId,
+                                a.note,
+                                user.id,
+                                a.film.id
+                              )
+                            }
+                          >
+                            <Edit fontSize="small" />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleDeleteNote(a.noteId)}
+                            color="error"
+                          >
+                            <Delete fontSize="small" />
+                          </IconButton>
+                        </>
                       )}
+                      {a.id && (
+                        <>
+                          <IconButton
+                            size="small"
+                            onClick={() =>
+                              handleUpdateAvis(
+                                a.id,
+                                a.contenu,
+                                user.id,
+                                a.film.id
+                              )
+                            }
+                          >
+                            <Edit fontSize="small" />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleDeleteAvis(a.id)}
+                            color="error"
+                          >
+                            <Delete fontSize="small" />
+                          </IconButton>
+                        </>
+                      )}
+
                       <Typography variant="caption">
                         Posté le {new Date(a.dateCreation).toLocaleDateString()}
                       </Typography>
@@ -187,6 +375,110 @@ function Profile() {
             )
           )}
         </Grid>
+      )}
+
+      {tabIndex === 2 && (
+        <Container>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={async () => {
+              const titre = prompt("Titre de la nouvelle liste :");
+              const description = prompt("Description :");
+
+              if (titre && description) {
+                await createListe({
+                  titre,
+                  description,
+                  utilisateurId: user.id,
+                });
+                fetchListes();
+              }
+            }}
+            sx={{ mb: 3 }}
+          >
+            Nouvelle liste
+          </Button>
+
+          {listes.length === 0 ? (
+            <Typography>Aucune liste créée.</Typography>
+          ) : (
+            listes.map((liste) => (
+              <Card key={liste.Id} sx={{ mb: 2 }}>
+                <CardContent>
+                  <Typography variant="h6">
+                    {liste.Titre}{" "}
+                    <IconButton onClick={() => handleUpdateListe(liste)}>
+                      <Edit fontSize="small" />
+                    </IconButton>
+                    <IconButton
+                      onClick={() => handleDeleteListe(liste.Id)}
+                      color="error"
+                    >
+                      <Delete fontSize="small" />
+                    </IconButton>
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mb: 1 }}
+                  >
+                    {liste.Description}
+                  </Typography>
+                  {liste.filmsIds.length === 0 ? (
+                    <>
+                      <Typography>Aucun film dans cette liste.</Typography>
+                      <Button
+                        variant="outlined"
+                        color="primary"
+                        size="small"
+                        onClick={() => navigate("/movies")}
+                        sx={{ mt: 1 }}
+                      >
+                        Ajouter des films
+                      </Button>
+                    </>
+                  ) : (
+                    <Grid container spacing={2}>
+                      {liste.filmsDetails?.map((film) => (
+                        <Grid item key={film.id} xs={6} sm={4} md={3}>
+                          <Card sx={{ position: "relative" }}>
+                            <CardMedia
+                              component="img"
+                              height="200"
+                              image={`https://image.tmdb.org/t/p/w500${film.poster_path}`}
+                              alt={film.title}
+                            />
+                            <IconButton
+                              size="small"
+                              onClick={() =>
+                                handleRemoveFilmFromListe(liste.Id, film.id)
+                              }
+                              sx={{
+                                position: "absolute",
+                                top: 8,
+                                right: 8,
+                                backgroundColor: "rgba(255,255,255,0.8)",
+                                borderRadius: "50%",
+                              }}
+                            >
+                              <Remove fontSize="small" />
+                            </IconButton>
+                            <CardContent>
+                              <Typography variant="subtitle2">
+                                {film.title}
+                              </Typography>
+                            </CardContent>
+                          </Card>
+                        </Grid>
+                      ))}
+                    </Grid>
+                  )}
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </Container>
       )}
     </div>
   );

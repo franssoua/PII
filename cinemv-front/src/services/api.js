@@ -1,4 +1,3 @@
-import { AppBar } from "@mui/material";
 import config from "../config";
 import axios from "axios";
 const apiKey = config.apiKey;
@@ -221,7 +220,7 @@ export const updateAvis = async (avisId, contenu, utilisateurId, filmId) => {
       {
         contenu,
         utilisateurId,
-        filmId,
+        filmId: String(filmId),
         dateCreation: new Date().toISOString(),
       },
       {
@@ -233,6 +232,7 @@ export const updateAvis = async (avisId, contenu, utilisateurId, filmId) => {
     );
   } catch (error) {
     console.error("Erreur lors de la modification de l'avis :", error);
+    throw error;
   }
 };
 
@@ -301,6 +301,126 @@ export const getAvisByUtilisateur = async (utilisateurId) => {
       error
     );
     return [];
+  }
+};
+
+export const getNotesByUtilisateur = async (utilisateurId) => {
+  try {
+    const response = await axios.get(
+      `${API_URL}/note/utilisateur/${utilisateurId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Erreur lors de la récupération des notes utilisateur :",
+      error
+    );
+    return [];
+  }
+};
+
+export const getListesByUtilisateur = async (utilisateurId) => {
+  try {
+    const response = await axios.get(`http://localhost:5180/api/listeFilms`);
+    const toutes = response.data.filter(
+      (l) => l.utilisateurId === utilisateurId
+    );
+
+    // Récupérer les détails des films pour chaque liste
+    for (const liste of toutes) {
+      const films = await Promise.all(
+        liste.filmsIds.map((id) => getMovieDetails(id))
+      );
+      liste.filmsDetails = films.filter((f) => f); // supprime les nulls
+    }
+
+    return toutes;
+  } catch (error) {
+    console.error("Erreur lors de la récupération des listes :", error);
+    return [];
+  }
+};
+
+export const createListe = async ({ titre, description, utilisateurId }) => {
+  try {
+    await axios.post(
+      "http://localhost:5180/api/listeFilms",
+      {
+        titre,
+        description,
+        utilisateurId,
+        filmsIds: [],
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+  } catch (error) {
+    console.error("Erreur lors de la création de la liste :", error);
+  }
+};
+
+export const updateListe = async (listeId, data) => {
+  try {
+    await axios.put(`${API_URL}/listeFilms/${listeId}`, data, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "Content-Type": "application/json",
+      },
+    });
+  } catch (error) {
+    console.error("Erreur lors de la mise à jour de la liste :", error);
+  }
+};
+
+export const deleteListe = async (listeId) => {
+  try {
+    await axios.delete(`${API_URL}/listeFilms/${listeId}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+  } catch (error) {
+    console.error("Erreur lors de la suppression de la liste :", error);
+  }
+};
+
+export const ajouterFilm = async (listeId, filmId) => {
+  try {
+    await axios.post(
+      `http://localhost:5180/api/listeFilms/${listeId}/ajouterFilm`,
+      JSON.stringify(filmId), // car attendu en tant que string brute
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+  } catch (error) {
+    console.error("Erreur lors de l'ajout du film à la liste :", error);
+    throw error;
+  }
+};
+
+export const supprimerFilm = async (listeId, filmId) => {
+  try {
+    await axios.post(
+      `http://localhost:5180/api/listeFilms/${listeId}/supprimerFilm`,
+      JSON.stringify(filmId), // idem ici
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+  } catch (error) {
+    console.error("Erreur lors de la suppression du film de la liste :", error);
+    throw error;
   }
 };
 

@@ -14,6 +14,8 @@ import {
   ajouterFavoris,
   supprimerFavoris,
   recupererFavoris,
+  getListesByUtilisateur,
+  ajouterFilm,
 } from "../services/api";
 import {
   Container,
@@ -28,6 +30,8 @@ import {
   ListItemText,
   Rating,
   IconButton,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import { Edit, Delete, Favorite, FavoriteBorder } from "@mui/icons-material";
 
@@ -41,6 +45,8 @@ function MovieDetails() {
   const [note, setNote] = useState(0);
   const { user } = useContext(AuthContext);
   const [isFavoris, setIsFavoris] = useState(false);
+  const [listes, setListes] = useState([]);
+  const [anchorEl, setAnchorEl] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -66,6 +72,9 @@ function MovieDetails() {
         if (userFavoris && userFavoris.favorisFilms.includes(id)) {
           setIsFavoris(true);
         }
+
+        const listesUser = await getListesByUtilisateur(user.id);
+        setListes(listesUser);
       }
     };
 
@@ -184,6 +193,26 @@ function MovieDetails() {
     }
   };
 
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleAddToList = async (listeId) => {
+    try {
+      await ajouterFilm(listeId, id);
+      alert("Film ajouté à la liste !");
+    } catch (error) {
+      console.error("Erreur lors de l'ajout du film à la liste :", error);
+      alert("Erreur : ce film est peut-être déjà dans cette liste.");
+    } finally {
+      handleMenuClose();
+    }
+  };
+
   // Fusionner avis + notes (utilisateurId en commun)
   const utilisateursAvecAvisOuNote = {};
 
@@ -229,9 +258,37 @@ function MovieDetails() {
             Note moyenne des utilisateurs : {moyenneNote} / 5
           </Typography>
           {user && (
-            <IconButton onClick={toggleFavoris}>
-              {isFavoris ? <Favorite color="error" /> : <FavoriteBorder />}
-            </IconButton>
+            <>
+              <IconButton onClick={toggleFavoris}>
+                {isFavoris ? <Favorite color="error" /> : <FavoriteBorder />}
+              </IconButton>
+              <p/>
+              <Button
+                variant="outlined"
+                onClick={handleMenuOpen}
+                sx={{ mt: 1 }}
+              >
+                Ajouter
+              </Button>
+              <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleMenuClose}
+              >
+                {listes.length === 0 ? (
+                  <MenuItem disabled>Aucune liste</MenuItem>
+                ) : (
+                  listes.map((liste) => (
+                    <MenuItem
+                      key={liste.Id}
+                      onClick={() => handleAddToList(liste.Id)}
+                    >
+                      {liste.Titre}
+                    </MenuItem>
+                  ))
+                )}
+              </Menu>
+            </>
           )}
         </CardContent>
       </Card>
