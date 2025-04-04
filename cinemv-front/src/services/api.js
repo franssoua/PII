@@ -44,6 +44,29 @@ export const register = async (userData) => {
   return response.data;
 };
 
+export const getUtilisateurById = async (id) => {
+  try {
+    const response = await api.get(`/utilisateur/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Erreur lors de la récupération de l'utilisateur :", error);
+    return null;
+  }
+};
+
+export const updateUtilisateur = async (id, data) => {
+  try {
+    await axios.put(`http://localhost:5180/api/utilisateur/${id}`, data, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "Content-Type": "application/json",
+      },
+    });
+  } catch (error) {
+    console.error("Erreur lors de la mise à jour de l'utilisateur :", error);
+  }
+};
+
 export const getCurrentMovies = async () => {
   try {
     const response = await tmdbApi.get("movie/now_playing");
@@ -319,24 +342,46 @@ export const getNotesByUtilisateur = async (utilisateurId) => {
   }
 };
 
+// export const getListesByUtilisateur = async (utilisateurId) => {
+//   try {
+//     const response = await axios.get(`http://localhost:5180/api/listeFilms`);
+//     const toutes = response.data.filter(
+//       (l) => l.utilisateurId === utilisateurId
+//     );
+
+//     // Récupérer les détails des films pour chaque liste
+//     for (const liste of toutes) {
+//       const films = await Promise.all(
+//         liste.filmsIds.map((id) => getMovieDetails(id))
+//       );
+//       liste.filmsDetails = films.filter((f) => f); // supprime les nulls
+//     }
+
+//     return toutes;
+//   } catch (error) {
+//     console.error("Erreur lors de la récupération des listes :", error);
+//     return [];
+//   }
+// };
 export const getListesByUtilisateur = async (utilisateurId) => {
   try {
-    const response = await axios.get(`http://localhost:5180/api/listeFilms`);
-    const toutes = response.data.filter(
-      (l) => l.utilisateurId === utilisateurId
+    const response = await axios.get(
+      `http://localhost:5180/api/listeFilms/utilisateur/${utilisateurId}`
     );
 
-    // Récupérer les détails des films pour chaque liste
-    for (const liste of toutes) {
+    for (const liste of response.data) {
       const films = await Promise.all(
         liste.filmsIds.map((id) => getMovieDetails(id))
       );
       liste.filmsDetails = films.filter((f) => f); // supprime les nulls
     }
 
-    return toutes;
+    return response.data;
   } catch (error) {
-    console.error("Erreur lors de la récupération des listes :", error);
+    console.error(
+      "Erreur lors de la récupération des listes de l'utilisateur :",
+      error
+    );
     return [];
   }
 };

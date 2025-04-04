@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
-import { useInRouterContext, useParams } from "react-router-dom";
+import { useInRouterContext, useParams, Link } from "react-router-dom";
 import {
   getMovieDetails,
   getAvisByFilm,
@@ -262,7 +262,7 @@ function MovieDetails() {
               <IconButton onClick={toggleFavoris}>
                 {isFavoris ? <Favorite color="error" /> : <FavoriteBorder />}
               </IconButton>
-              <p/>
+              <p />
               <Button
                 variant="outlined"
                 onClick={handleMenuOpen}
@@ -339,15 +339,36 @@ function MovieDetails() {
               const utilisateurId = avis?.utilisateurId || note?.utilisateurId;
               const nomUtilisateur =
                 avis?.nomUtilisateur || note?.nomUtilisateur || "Inconnu";
+              const photoProfil =
+                avis?.photoProfil ||
+                note?.photoProfil ||
+                "/images/Default_pfp.svg.webp";
 
               return (
                 <ListItem
                   key={index}
-                  sx={{ display: "flex", alignItems: "center" }}
+                  sx={{ display: "flex", alignItems: "center", gap: 2 }}
                 >
+                  <Link
+                    to={`/user/${utilisateurId}`}
+                    style={{
+                      textDecoration: "none",
+                      color: "inherit",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                    }}
+                  >
+                    <img
+                      src={photoProfil}
+                      alt={nomUtilisateur}
+                      style={{ width: 50, height: 50, borderRadius: "50%" }}
+                    />
+                    <Typography fontWeight="bold">{nomUtilisateur}</Typography>
+                  </Link>
                   <ListItemText
                     primary={avis ? avis.contenu : "Aucun avis posté."}
-                    secondary={`Posté par ${nomUtilisateur} le ${new Date(
+                    secondary={`Posté le ${new Date(
                       (avis || note).dateCreation
                     ).toLocaleDateString()}`}
                   />
