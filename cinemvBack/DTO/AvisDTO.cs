@@ -11,6 +11,9 @@ public class AvisDTO
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public string? NomUtilisateur { get; set; }
 
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public string? PhotoProfil { get; set; }
+
     public AvisDTO() { }
 
     public AvisDTO(Avis avis)
@@ -20,6 +23,10 @@ public class AvisDTO
         DateCreation = avis.DateCreation;
         UtilisateurId = avis.UtilisateurId;
         FilmId = avis.FilmId;
-        NomUtilisateur = avis.Utilisateur?.NomUtilisateur ?? "Utilisateur inconnu";
+        if (avis.Utilisateur != null)
+        {
+            NomUtilisateur = avis.Utilisateur.NomUtilisateur;
+            PhotoProfil = avis.Utilisateur.PhotoProfil;
+        }
     }
 }

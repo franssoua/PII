@@ -11,6 +11,9 @@ public class NoteDTO
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public string? NomUtilisateur { get; set; }
 
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public string? PhotoProfil { get; set; }
+
     public NoteDTO() { }
 
     public NoteDTO(Note note)
@@ -20,6 +23,10 @@ public class NoteDTO
         DateCreation = note.DateCreation;
         UtilisateurId = note.UtilisateurId;
         FilmId = note.FilmId;
-        NomUtilisateur = note.Utilisateur?.NomUtilisateur ?? "Utilisateur inconnu";
+        if (note.Utilisateur != null)
+        {
+            NomUtilisateur = note.Utilisateur.NomUtilisateur;
+            PhotoProfil = note.Utilisateur.PhotoProfil;
+        }
     }
 }

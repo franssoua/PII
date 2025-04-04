@@ -35,6 +35,19 @@ public class ListeFilmsController : ControllerBase
         return new ListeFilmsDTO(listeFilms);
     }
 
+    [HttpGet("utilisateur/{utilisateurId}")]
+    public async Task<ActionResult<IEnumerable<ListeFilmsDTO>>> GetListesByUtilisateur(
+        int utilisateurId
+    )
+    {
+        var listes = await _context
+            .ListesFilms.Where(l => l.UtilisateurId == utilisateurId)
+            .ToListAsync();
+
+        var dtoListes = listes.Select(l => new ListeFilmsDTO(l)).ToList();
+        return Ok(dtoListes);
+    }
+
     [HttpPost]
     [Authorize]
     public async Task<IActionResult> CreateList(ListeFilmsDTO listeFilmsDTO)

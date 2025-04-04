@@ -14,6 +14,7 @@ public class UtilisateurDTO
 
     [JsonPropertyName("Date d'inscription")]
     public string DateInscription { get; set; } = null!;
+    public string? PhotoProfil { get; set; }
 
     public UtilisateurDTO() { }
 
@@ -23,6 +24,7 @@ public class UtilisateurDTO
         NomUtilisateur = utilisateur.NomUtilisateur;
         Email = utilisateur.Email;
         DateInscription = utilisateur.DateInscription.ToString("yyyy-MM-dd");
+        PhotoProfil = utilisateur.PhotoProfil;
     }
 }
 

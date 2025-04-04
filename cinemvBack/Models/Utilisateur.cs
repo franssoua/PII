@@ -8,6 +8,7 @@ public class Utilisateur
     public string NomUtilisateur { get; set; } = null!;
     public string Email { get; set; } = null!;
     public string MotDePasse { get; set; } = null!;
+    public string? PhotoProfil { get; set; } = null!;
     public bool IsAdmin { get; set; } = false;
     public DateTime DateInscription { get; set; } //=DateTime.Now;
     public ICollection<ListeFilms>? Listes { get; set; }
@@ -23,6 +24,7 @@ public class Utilisateur
         Id = utilisateurDTO.Id;
         NomUtilisateur = utilisateurDTO.NomUtilisateur;
         Email = utilisateurDTO.Email;
+        PhotoProfil = utilisateurDTO.PhotoProfil;
         DateInscription = DateTime.Parse(utilisateurDTO.DateInscription);
         Listes = new List<ListeFilms>();
         Avis = new List<Avis>();
