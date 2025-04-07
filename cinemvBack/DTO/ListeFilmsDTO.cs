@@ -3,14 +3,9 @@ using cinemvBack.Models;
 
 public class ListeFilmsDTO
 {
-    [JsonPropertyName("Id")]
     public int Id { get; set; }
     public int UtilisateurId { get; set; }
-
-    [JsonPropertyName("Titre")]
     public string Titre { get; set; } = null!;
-
-    [JsonPropertyName("Description")]
     public string Description { get; set; } = null!;
     public List<string> FilmsIds { get; set; } = new List<string>();
 

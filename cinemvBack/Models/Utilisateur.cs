@@ -8,9 +8,9 @@ public class Utilisateur
     public string NomUtilisateur { get; set; } = null!;
     public string Email { get; set; } = null!;
     public string MotDePasse { get; set; } = null!;
-    public string? PhotoProfil { get; set; } = null!;
+    public string? PhotoProfil { get; set; }
     public bool IsAdmin { get; set; } = false;
-    public DateTime DateInscription { get; set; } //=DateTime.Now;
+    public DateTime DateInscription { get; set; }
     public ICollection<ListeFilms>? Listes { get; set; }
     public ICollection<Avis>? Avis { get; set; }
     public ICollection<Note>? Notes { get; set; }
@@ -30,6 +30,7 @@ public class Utilisateur
         Avis = new List<Avis>();
         Notes = new List<Note>();
         Abonnements = new List<Utilisateur>();
+        IsAdmin = utilisateurDTO.IsAdmin;
     }
 
     public static Utilisateur FromDto(RegisterDTO registerDTO)
@@ -39,7 +40,7 @@ public class Utilisateur
             NomUtilisateur = registerDTO.NomUtilisateur,
             Email = registerDTO.Email,
             MotDePasse = HashPassword(registerDTO.MotDePasse),
-            //DateInscription = registerDTO.DateInscription,
+            DateInscription = DateTime.Now,
         };
     }
 
@@ -62,7 +63,7 @@ public class Utilisateur
 
         if (!string.IsNullOrEmpty(updateUtilisateurDTO.MotDePasse))
         {
-            MotDePasse = updateUtilisateurDTO.MotDePasse;
+            MotDePasse = HashPassword(updateUtilisateurDTO.MotDePasse);
         }
     }
 

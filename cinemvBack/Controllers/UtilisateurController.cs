@@ -43,6 +43,27 @@ public class UtilisateurController : ControllerBase
         return new UtilisateurDTO(utilisateur);
     }
 
+    [HttpGet("me")]
+    [Authorize]
+    public async Task<ActionResult<UtilisateurDTO>> GetCurrentUser()
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim == null)
+        {
+            return Unauthorized("Utilisateur non authentifié.");
+        }
+
+        int userId = int.Parse(userIdClaim.Value);
+        var utilisateur = await _context.Utilisateurs.FindAsync(userId);
+
+        if (utilisateur == null)
+        {
+            return NotFound("Utilisateur non trouvé.");
+        }
+
+        return Ok(new UtilisateurDTO(utilisateur));
+    }
+
     [HttpGet("isadmin")]
     [Authorize]
     public IActionResult IsAdmin()

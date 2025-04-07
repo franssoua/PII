@@ -33,11 +33,6 @@ public class NoteController : ControllerBase
             .Notes.Include(a => a.Utilisateur)
             .Where(a => a.FilmId == filmId)
             .ToListAsync();
-        // if (notes.Count == 0)
-        // {
-        //     return Ok(new List<NoteDTO>());
-        // }
-        // var noteDTO = notes.Select(a => new NoteDTO(a)).ToList();
 
         return Ok(notes.Select(a => new NoteDTO(a)).ToList());
     }
