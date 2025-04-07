@@ -1,16 +1,10 @@
 import { Stack, Button, Container, Typography } from "@mui/material";
 import { useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 
 function Home() {
   const { user, logout } = useContext(AuthContext);
-  // const navigate = useNavigate();
-
-  // const handleLogout = () => {
-  //   logout();
-  //   navigate("/login");
-  // };
 
   return (
     <Container>
@@ -33,6 +27,13 @@ function Home() {
                 Votre profil
               </Button>
             </Link>
+            {user.isAdmin && (
+              <Link to="/admin">
+                <Button variant="contained" color="warning" fullWidth>
+                  Admin
+                </Button>
+              </Link>
+            )}
           </>
         ) : (
           <>

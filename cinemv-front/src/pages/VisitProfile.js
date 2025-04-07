@@ -58,12 +58,10 @@ function VisitProfile() {
 
   return (
     <Container sx={{ mt: 4 }}>
-      <Typography variant="h4">
-        Profil de {userData["Nom d'utilisateur"]}
-      </Typography>
+      <Typography variant="h4">Profil de {userData.nomUtilisateur}</Typography>
       <Typography variant="subtitle1">
         Inscrit(e) depuis le{" "}
-        {new Date(userData["Date d'inscription"]).toLocaleDateString()}
+        {new Date(userData.dateInscription).toLocaleDateString()}
       </Typography>
       <img
         src={userData.photoProfil || "/images/Default_pfp.svg.webp"}

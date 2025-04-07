@@ -15,9 +15,9 @@ function Register() {
     e.preventDefault();
     try {
       await register({
-        "Nom d'utilisateur": nomUtilisateur,
+        NomUtilisateur: nomUtilisateur,
         Email: email,
-        "Mot de passe": motDePasse,
+        MotDePasse: motDePasse,
       });
       await login(email, motDePasse); // Connexion automatique après l'inscription
       navigate("/"); // Redirige vers la page d'accueil

@@ -7,9 +7,27 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    localStorage.removeItem("token");
-    delete api.defaults.headers.common["Authorization"];
-    setUser(null);
+    const token = localStorage.getItem("token");
+    if (token) {
+      api
+        .get("/utilisateur/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((res) => {
+          setUser(res.data);
+        })
+        .catch((err) => {
+          console.error(
+            "Erreur lors de la récupération de l'utilisateur :",
+            err
+          );
+          localStorage.removeItem("token");
+          delete api.defaults.headers.common["Authorization"];
+          setUser(null);
+        });
+    }
   }, []);
 
   const login = async (email, password) => {

@@ -44,38 +44,8 @@ function Profile() {
   const [listes, setListes] = useState([]);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchFavoris = async () => {
-      if (user) {
-        const allFavoris = await recupererFavoris();
-        const userFavoris = allFavoris.find((f) => f.utilisateurId === user.id);
-        if (userFavoris) {
-          const films = (
-            await Promise.all(
-              userFavoris.favorisFilms.map((filmId) => getMovieDetails(filmId))
-            )
-          ).filter((film) => film !== null);
-
-          setFavoris(films);
-        }
-      }
-    };
-
-    if (showFavoris) {
-      fetchFavoris();
-    }
-
-    if (tabIndex === 1) {
-      fetchAvis();
-    }
-
-    if (tabIndex === 2) {
-      fetchListes();
-    }
-  }, [tabIndex, showFavoris, user]);
-
   const fetchAvis = async () => {
-    if (user) {
+    if (!user?.id) {
       const avisUtilisateur = await getAvisByUtilisateur(user.id);
       const notesUtilisateur = await getNotesByUtilisateur(user.id);
 
@@ -123,7 +93,7 @@ function Profile() {
   };
 
   const fetchListes = async () => {
-    if (user) {
+    if (!user?.id) {
       try {
         const listesUtilisateur = await getListesByUtilisateur(user.id);
         setListes(listesUtilisateur);
@@ -132,6 +102,38 @@ function Profile() {
       }
     }
   };
+
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const fetchFavoris = async () => {
+      if (user) {
+        const allFavoris = await recupererFavoris();
+        const userFavoris = allFavoris.find((f) => f.utilisateurId === user.id);
+        if (userFavoris) {
+          const films = (
+            await Promise.all(
+              userFavoris.favorisFilms.map((filmId) => getMovieDetails(filmId))
+            )
+          ).filter((film) => film !== null);
+
+          setFavoris(films);
+        }
+      }
+    };
+
+    if (showFavoris) {
+      fetchFavoris();
+    }
+
+    if (tabIndex === 1) {
+      fetchAvis();
+    }
+
+    if (tabIndex === 2) {
+      fetchListes();
+    }
+  }, [tabIndex, showFavoris, user]);
 
   const handleUpdateAvis = async (avisId, contenu, utilisateurId, filmId) => {
     const nouveauContenu = prompt("Modifier votre avis :", contenu);

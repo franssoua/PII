@@ -9,6 +9,9 @@ import Register from "./pages/Register";
 import Profile from "./pages/Profile";
 import MovieDetails from "./pages/MovieDetails";
 import VisitProfile from "./pages/VisitProfile";
+import AdminPage from "./pages/AdminPage";
+import PrivateRoute from "./components/PrivateRoute";
+
 function AppContent() {
   const { user } = useContext(AuthContext);
 
@@ -28,6 +31,14 @@ function AppContent() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/movie/:id" element={<MovieDetails />} />
         <Route path="/user/:id" element={<VisitProfile />} />
+        <Route
+          path="/admin"
+          element={
+            <PrivateRoute>
+              <AdminPage />
+            </PrivateRoute>
+          }
+        />
       </Routes>
     </div>
   );
