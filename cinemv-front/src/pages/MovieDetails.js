@@ -1,16 +1,12 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, useCallback } from "react";
 import { AuthContext } from "../context/AuthContext";
-import { useInRouterContext, useParams, Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import {
   getMovieDetails,
   getAvisByFilm,
   getNotesByFilm,
   postAvis,
   postNote,
-  updateAvis,
-  deleteAvis,
-  updateNote,
-  deleteNote,
   ajouterFavoris,
   supprimerFavoris,
   recupererFavoris,
@@ -27,13 +23,19 @@ import {
   Button,
   List,
   ListItem,
-  ListItemText,
   Rating,
   IconButton,
   Menu,
   MenuItem,
 } from "@mui/material";
-import { Edit, Delete, Favorite, FavoriteBorder } from "@mui/icons-material";
+import { Favorite, FavoriteBorder } from "@mui/icons-material";
+import AvisCard from "../components/AvisCard";
+import {
+  handleUpdateAvis,
+  handleDeleteAvis,
+  handleUpdateNote,
+  handleDeleteNote,
+} from "../utils/avisHandlers";
 
 function MovieDetails() {
   const { id } = useParams();
@@ -48,38 +50,38 @@ function MovieDetails() {
   const [listes, setListes] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
 
+  const fetchData = useCallback(async () => {
+    const data = await getMovieDetails(id);
+    setMovie(data);
+
+    const avisData = await getAvisByFilm(id);
+    setAvis(avisData);
+
+    const notesData = await getNotesByFilm(id);
+    setNotes(notesData || []);
+
+    if (notesData.length > 0) {
+      const moyenne =
+        notesData.reduce((acc, curr) => acc + curr.valeur, 0) /
+        notesData.length;
+      setMoyenneNote(moyenne.toFixed(1));
+    }
+
+    if (user) {
+      const favoris = await recupererFavoris();
+      const userFavoris = favoris.find((f) => f.utilisateurId === user.id);
+      if (userFavoris && userFavoris.favorisFilms.includes(id)) {
+        setIsFavoris(true);
+      }
+
+      const listesUser = await getListesByUtilisateur(user.id);
+      setListes(listesUser);
+    }
+  }, [id, user]);
+
   useEffect(() => {
-    const fetchData = async () => {
-      const data = await getMovieDetails(id);
-      setMovie(data);
-
-      const avisData = await getAvisByFilm(id);
-      setAvis(avisData);
-
-      const notesData = await getNotesByFilm(id);
-      setNotes(notesData || []);
-
-      if (notesData.length > 0) {
-        const moyenne =
-          notesData.reduce((acc, curr) => acc + curr.valeur, 0) /
-          notesData.length;
-        setMoyenneNote(moyenne.toFixed(1));
-      }
-
-      if (user) {
-        const favoris = await recupererFavoris();
-        const userFavoris = favoris.find((f) => f.utilisateurId === user.id);
-        if (userFavoris && userFavoris.favorisFilms.includes(id)) {
-          setIsFavoris(true);
-        }
-
-        const listesUser = await getListesByUtilisateur(user.id);
-        setListes(listesUser);
-      }
-    };
-
     fetchData();
-  }, [id]);
+  }, [id, fetchData]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -89,7 +91,7 @@ function MovieDetails() {
       return;
     }
 
-    const utilisateurId = user.id; // ID temporaire en attendant l'authentification
+    const utilisateurId = user.id;
 
     if (!commentaire && note === 0) {
       alert("Veuillez entrer une note ou un commentaire.");
@@ -135,7 +137,6 @@ function MovieDetails() {
     setCommentaire("");
     setNote(0);
 
-    //Rafraîchir les avis et notes après ajout
     setAvis(await getAvisByFilm(id));
     const notesData = await getNotesByFilm(id);
     setNotes(notesData);
@@ -143,42 +144,6 @@ function MovieDetails() {
       setMoyenneNote(
         notesData.reduce((acc, curr) => acc + curr.valeur, 0) / notesData.length
       );
-    }
-  };
-
-  const handleUpdateAvis = async (avisId, contenu, utilisateurId) => {
-    const nouveauContenu = prompt("Modifier votre avis :", contenu);
-    if (nouveauContenu) {
-      await updateAvis(avisId, nouveauContenu, utilisateurId, id);
-      setAvis(await getAvisByFilm(id));
-    }
-  };
-
-  const handleDeleteAvis = async (avisId) => {
-    if (window.confirm("Voulez-vous vraiment supprimer cet avis ?")) {
-      await deleteAvis(avisId);
-      setAvis(await getAvisByFilm(id));
-    }
-  };
-
-  const handleUpdateNote = async (noteId, valeur, utilisateurId) => {
-    const nouvelleValeur = prompt(
-      "Modifier votre note (entre 0 et 5) :",
-      valeur
-    );
-    const parsedValeur = parseFloat(nouvelleValeur);
-    if (!isNaN(parsedValeur) && parsedValeur >= 0 && parsedValeur <= 5) {
-      await updateNote(noteId, parsedValeur, utilisateurId, id);
-      setNotes(await getNotesByFilm(id));
-    } else {
-      alert("Veuillez entrer une valeur entre 0 et 5.");
-    }
-  };
-
-  const handleDeleteNote = async (noteId) => {
-    if (window.confirm("Voulez-vous vraiment supprimer cette note ?")) {
-      await deleteNote(noteId);
-      setNotes(await getNotesByFilm(id));
     }
   };
 
@@ -213,7 +178,6 @@ function MovieDetails() {
     }
   };
 
-  // Fusionner avis + notes (utilisateurId en commun)
   const utilisateursAvecAvisOuNote = {};
 
   avis.forEach((a) => {
@@ -345,86 +309,37 @@ function MovieDetails() {
                 "/images/Default_pfp.svg.webp";
 
               return (
-                <ListItem
-                  key={index}
-                  sx={{ display: "flex", alignItems: "center", gap: 2 }}
-                >
-                  <Link
-                    to={`/user/${utilisateurId}`}
-                    style={{
-                      textDecoration: "none",
-                      color: "inherit",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 8,
-                    }}
-                  >
-                    <img
-                      src={photoProfil}
-                      alt={nomUtilisateur}
-                      style={{ width: 50, height: 50, borderRadius: "50%" }}
-                    />
-                    <Typography fontWeight="bold">{nomUtilisateur}</Typography>
-                  </Link>
-                  <ListItemText
-                    primary={avis ? avis.contenu : "Aucun avis posté."}
-                    secondary={`Posté le ${new Date(
-                      (avis || note).dateCreation
-                    ).toLocaleDateString()}`}
+                <ListItem key={utilisateurId}>
+                  <AvisCard
+                    lien={`/user/${utilisateurId}`}
+                    imageSrc={photoProfil}
+                    titre={nomUtilisateur}
+                    contenu={avis?.contenu}
+                    note={note?.valeur ?? null}
+                    date={(avis || note)?.dateCreation}
+                    isOwner={user?.id === utilisateurId}
+                    onUpdateAvis={() =>
+                      handleUpdateAvis(
+                        avis?.id,
+                        avis?.contenu,
+                        utilisateurId,
+                        id,
+                        fetchData
+                      )
+                    }
+                    onDeleteAvis={() => handleDeleteAvis(avis?.id, fetchData)}
+                    onUpdateNote={() =>
+                      handleUpdateNote(
+                        note.id,
+                        note.valeur,
+                        utilisateurId,
+                        id,
+                        fetchData
+                      )
+                    }
+                    onDeleteNote={() => handleDeleteNote(note?.id, fetchData)}
+                    layout="list"
                   />
-
-                  {note && (
-                    <Typography variant="body2" sx={{ marginLeft: 2 }}>
-                      Note: {note.valeur} / 5
-                    </Typography>
-                  )}
-
-                  {user && user.id === utilisateurId && (
-                    <>
-                      {avis && (
-                        <>
-                          <IconButton
-                            onClick={() =>
-                              handleUpdateAvis(
-                                avis.id,
-                                avis.contenu,
-                                utilisateurId
-                              )
-                            }
-                          >
-                            <Edit />
-                          </IconButton>
-                          <IconButton
-                            onClick={() => handleDeleteAvis(avis.id)}
-                            color="error"
-                          >
-                            <Delete />
-                          </IconButton>
-                        </>
-                      )}
-                      {note && (
-                        <>
-                          <IconButton
-                            onClick={() =>
-                              handleUpdateNote(
-                                note.id,
-                                note.valeur,
-                                utilisateurId
-                              )
-                            }
-                          >
-                            <Edit />
-                          </IconButton>
-                          <IconButton
-                            onClick={() => handleDeleteNote(note.id)}
-                            color="error"
-                          >
-                            <Delete />
-                          </IconButton>
-                        </>
-                      )}
-                    </>
-                  )}
                 </ListItem>
               );
             })}

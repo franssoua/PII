@@ -33,7 +33,7 @@ function MovieCard({
               borderRadius: "50%",
             }}
             onClick={(e) => {
-              e.preventDefault(); // empêche le clic de naviguer
+              e.preventDefault();
               onActionClick(film.id);
             }}
           >

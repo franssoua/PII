@@ -5,9 +5,7 @@ import {
   Typography,
   Card,
   CardContent,
-  CardMedia,
   Grid,
-  Rating,
 } from "@mui/material";
 import {
   getUtilisateurById,
@@ -16,6 +14,8 @@ import {
   getListesByUtilisateur,
   getMovieDetails,
 } from "../services/api";
+import MovieCard from "../components/MovieCard";
+import AvisCard from "../components/AvisCard";
 
 function VisitProfile() {
   const { id } = useParams();
@@ -74,61 +74,52 @@ function VisitProfile() {
         }}
       />
 
-      {/* AVIS */}
       <Typography variant="h5" sx={{ mt: 4 }}>
         Avis
       </Typography>
       {avis.length === 0 ? (
         <Typography>Aucun avis posté.</Typography>
       ) : (
-        avis.map((a) => (
-          <Card key={a.id} sx={{ mb: 2 }}>
-            <CardContent sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-              {a.film && (
-                <CardMedia
-                  component="img"
-                  image={`https://image.tmdb.org/t/p/w200${a.film.poster_path}`}
-                  alt={a.film.title}
-                  sx={{ width: 80 }}
-                />
-              )}
-              <div>
-                <Typography variant="body1">{a.contenu}</Typography>
-                <Typography variant="caption">
-                  Posté le {new Date(a.dateCreation).toLocaleDateString()}
-                </Typography>
-              </div>
-            </CardContent>
-          </Card>
-        ))
+        avis.map((a) =>
+          a.film ? (
+            <AvisCard
+              key={a.id}
+              lien={`/movie/${a.film.id}`}
+              imageSrc={`https://image.tmdb.org/t/p/w200${a.film.poster_path}`}
+              titre={a.film.title}
+              contenu={a.contenu}
+              note={null}
+              date={a.dateCreation}
+              isOwner={false}
+              layout="card"
+            />
+          ) : null
+        )
       )}
 
-      {/* NOTES */}
       <Typography variant="h5" sx={{ mt: 4 }}>
         Notes
       </Typography>
       {notes.length === 0 ? (
         <Typography>Aucune note attribuée.</Typography>
       ) : (
-        notes.map((n) => (
-          <Card key={n.id} sx={{ mb: 2 }}>
-            <CardContent sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-              {n.film && (
-                <CardMedia
-                  component="img"
-                  image={`https://image.tmdb.org/t/p/w200${n.film.poster_path}`}
-                  alt={n.film.title}
-                  sx={{ width: 80 }}
-                />
-              )}
-              <Typography variant="body1">{n.film.title}</Typography>
-              <Rating value={n.valeur} readOnly precision={0.5} />
-            </CardContent>
-          </Card>
-        ))
+        notes.map((n) =>
+          n.film ? (
+            <AvisCard
+              key={n.id}
+              lien={`/movie/${n.film.id}`}
+              imageSrc={`https://image.tmdb.org/t/p/w200${n.film.poster_path}`}
+              titre={n.film.title}
+              contenu={null}
+              note={n.valeur}
+              date={n.dateCreation}
+              isOwner={false}
+              layout="card"
+            />
+          ) : null
+        )
       )}
 
-      {/* LISTES */}
       <Typography variant="h5" sx={{ mt: 4 }}>
         Listes
       </Typography>
@@ -145,19 +136,7 @@ function VisitProfile() {
               <Grid container spacing={2}>
                 {liste.filmsDetails?.map((film) => (
                   <Grid item key={film.id} xs={6} sm={4} md={3}>
-                    <Card>
-                      <CardMedia
-                        component="img"
-                        height="200"
-                        image={`https://image.tmdb.org/t/p/w500${film.poster_path}`}
-                        alt={film.title}
-                      />
-                      <CardContent>
-                        <Typography variant="subtitle2">
-                          {film.title}
-                        </Typography>
-                      </CardContent>
-                    </Card>
+                    <MovieCard film={film} />
                   </Grid>
                 ))}
               </Grid>

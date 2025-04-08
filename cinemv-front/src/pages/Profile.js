@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useCallback } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import {
@@ -6,11 +6,6 @@ import {
   recupererFavoris,
   getAvisByUtilisateur,
   getNotesByUtilisateur,
-  getNotesByFilm,
-  updateAvis,
-  updateNote,
-  deleteAvis,
-  deleteNote,
   supprimerFavoris,
   getListesByUtilisateur,
   createListe,
@@ -25,15 +20,20 @@ import {
   Button,
   Grid,
   Card,
-  CardMedia,
   CardContent,
   Tabs,
   Tab,
-  Rating,
   IconButton,
 } from "@mui/material";
 import { Edit, Delete, Favorite, Remove } from "@mui/icons-material";
 import MovieCard from "../components/MovieCard";
+import AvisCard from "../components/AvisCard";
+import {
+  handleUpdateAvis,
+  handleDeleteAvis,
+  handleUpdateNote,
+  handleDeleteNote,
+} from "../utils/avisHandlers";
 
 function Profile() {
   const { user, updateUserLocally } = useContext(AuthContext);
@@ -41,11 +41,10 @@ function Profile() {
   const [showFavoris, setShowFavoris] = useState(false);
   const [tabIndex, setTabIndex] = useState(0);
   const [avis, setAvis] = useState([]);
-  const [notes, setNotes] = useState([]);
   const [listes, setListes] = useState([]);
   const navigate = useNavigate();
 
-  const fetchAvis = async () => {
+  const fetchAvis = useCallback(async () => {
     if (!user?.id) return;
     const avisUtilisateur = await getAvisByUtilisateur(user.id);
     const notesUtilisateur = await getNotesByUtilisateur(user.id);
@@ -86,9 +85,9 @@ function Profile() {
     );
 
     setAvis(avisEtNotes);
-  };
+  }, [user]);
 
-  const fetchListes = async () => {
+  const fetchListes = useCallback(async () => {
     if (!user?.id) return;
 
     try {
@@ -97,7 +96,7 @@ function Profile() {
     } catch (error) {
       console.error("Erreur lors de la récupération des listes :", error);
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     if (!user?.id) return;
@@ -129,40 +128,7 @@ function Profile() {
     if (tabIndex === 2) {
       fetchListes();
     }
-  }, [tabIndex, showFavoris, user]);
-
-  const handleUpdateAvis = async (avisId, contenu, utilisateurId, filmId) => {
-    const nouveauContenu = prompt("Modifier votre avis :", contenu);
-    if (nouveauContenu) {
-      await updateAvis(avisId, nouveauContenu, utilisateurId, filmId);
-      await fetchAvis();
-    }
-  };
-
-  const handleUpdateNote = async (noteId, valeur, utilisateurId, filmId) => {
-    const nouvelleValeur = prompt("Modifier votre note :", valeur);
-    const parsedValeur = parseFloat(nouvelleValeur);
-    if (!isNaN(parsedValeur) && parsedValeur >= 0 && parsedValeur <= 5) {
-      await updateNote(noteId, parsedValeur, utilisateurId, String(filmId));
-      await fetchAvis();
-    } else {
-      alert("Veuillez entrer une valeur entre 0 et 5.");
-    }
-  };
-
-  const handleDeleteAvis = async (avisId) => {
-    if (window.confirm("Voulez-vous vraiment supprimer cet avis ?")) {
-      await deleteAvis(avisId);
-      await fetchAvis();
-    }
-  };
-
-  const handleDeleteNote = async (noteId) => {
-    if (window.confirm("Voulez-vous vraiment supprimer cette note ?")) {
-      await deleteNote(noteId);
-      await fetchAvis();
-    }
-  };
+  }, [tabIndex, showFavoris, user, fetchAvis, fetchListes]);
 
   const handleRemoveFavori = async (filmId) => {
     if (!user) return;
@@ -250,12 +216,6 @@ function Profile() {
           backgroundSize: "cover",
         }}
       ></div>
-      {/* 
-      <img
-        src={user.photoProfil || "/images/Default_pfp.svg.webp"}
-        alt="Profil"
-        style={{ width: 100, height: 100, borderRadius: "50%" }}
-      /> */}
       <Button className="bg-green" onClick={handleUpdatePhotoProfil}>
         Modifier la photo de profil
       </Button>
@@ -289,37 +249,12 @@ function Profile() {
           ) : (
             favoris.map((film) => (
               <Grid item key={film.id} xs={12} sm={6} md={4} lg={2}>
-                {/* <MovieCard
-                    film={film}
-                    onActionClick={handleRemoveFavori}
-                    actionIcon={<Favorite />}
-                    actionColor="error"
-                  /> */}
-
-                <Card sx={{ maxWidth: 200, mx: "auto", position: "relative" }}>
-                  <CardMedia
-                    component="img"
-                    height="300"
-                    image={`https://image.tmdb.org/t/p/w500${film.poster_path}`}
-                    alt={film.title}
-                  />
-                  <IconButton
-                    sx={{
-                      position: "absolute",
-                      top: 8,
-                      right: 8,
-                      color: "error.main",
-                      backgroundColor: "rgba(255,255,255,0.8)",
-                      borderRadius: "50%",
-                    }}
-                    onClick={() => handleRemoveFavori(film.id)}
-                  >
-                    <Favorite />
-                  </IconButton>
-                  <CardContent>
-                    <Typography variant="subtitle1">{film.title}</Typography>
-                  </CardContent>
-                </Card>
+                <MovieCard
+                  film={film}
+                  onActionClick={handleRemoveFavori}
+                  actionIcon={<Favorite />}
+                  actionColor="error"
+                />
               </Grid>
             ))
           )}
@@ -334,81 +269,35 @@ function Profile() {
             avis.map((a) =>
               a.film ? (
                 <Grid item key={a.id || a.noteId} xs={12} sm={6} md={4}>
-                  <Card sx={{ display: "flex", alignItems: "center", p: 1 }}>
-                    <CardMedia
-                      component="img"
-                      image={`https://image.tmdb.org/t/p/w200${a.film.poster_path}`}
-                      alt={a.film.title}
-                      sx={{ width: 100 }}
-                    />
-                    <CardContent sx={{ flex: 1 }}>
-                      <Typography variant="subtitle1">
-                        {a.film.title}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {a.contenu}
-                      </Typography>
-                      {a.note !== null && (
-                        <>
-                          <Rating
-                            value={a.note}
-                            precision={0.5}
-                            readOnly
-                            size="small"
-                            sx={{ mb: 1 }}
-                          />
-                          <IconButton
-                            size="small"
-                            onClick={() =>
-                              handleUpdateNote(
-                                a.noteId,
-                                a.note,
-                                user.id,
-                                a.film.id
-                              )
-                            }
-                          >
-                            <Edit fontSize="small" />
-                          </IconButton>
-                          <IconButton
-                            size="small"
-                            onClick={() => handleDeleteNote(a.noteId)}
-                            color="error"
-                          >
-                            <Delete fontSize="small" />
-                          </IconButton>
-                        </>
-                      )}
-                      {a.id && (
-                        <>
-                          <IconButton
-                            size="small"
-                            onClick={() =>
-                              handleUpdateAvis(
-                                a.id,
-                                a.contenu,
-                                user.id,
-                                a.film.id
-                              )
-                            }
-                          >
-                            <Edit fontSize="small" />
-                          </IconButton>
-                          <IconButton
-                            size="small"
-                            onClick={() => handleDeleteAvis(a.id)}
-                            color="error"
-                          >
-                            <Delete fontSize="small" />
-                          </IconButton>
-                        </>
-                      )}
-
-                      <Typography variant="caption">
-                        Posté le {new Date(a.dateCreation).toLocaleDateString()}
-                      </Typography>
-                    </CardContent>
-                  </Card>
+                  <AvisCard
+                    lien={`/movie/${a.film.id}`}
+                    imageSrc={`https://image.tmdb.org/t/p/w200${a.film.poster_path}`}
+                    titre={a.film.title}
+                    contenu={a.contenu}
+                    note={a.note}
+                    date={a.dateCreation}
+                    isOwner={true}
+                    onUpdateAvis={() =>
+                      handleUpdateAvis(
+                        a.id,
+                        a.contenu,
+                        user.id,
+                        a.film.id,
+                        fetchAvis
+                      )
+                    }
+                    onDeleteAvis={() => handleDeleteAvis(a.id, fetchAvis)}
+                    onUpdateNote={() =>
+                      handleUpdateNote(
+                        a.noteId,
+                        a.note,
+                        user.id,
+                        a.film.id,
+                        fetchAvis
+                      )
+                    }
+                    onDeleteNote={() => handleDeleteNote(a.noteId, fetchAvis)}
+                  />
                 </Grid>
               ) : null
             )
@@ -481,34 +370,14 @@ function Profile() {
                     <Grid container spacing={2}>
                       {liste.filmsDetails?.map((film) => (
                         <Grid item key={film.id} xs={6} sm={4} md={3}>
-                          <Card sx={{ position: "relative" }}>
-                            <CardMedia
-                              component="img"
-                              height="200"
-                              image={`https://image.tmdb.org/t/p/w500${film.poster_path}`}
-                              alt={film.title}
-                            />
-                            <IconButton
-                              size="small"
-                              onClick={() =>
-                                handleRemoveFilmFromListe(liste.id, film.id)
-                              }
-                              sx={{
-                                position: "absolute",
-                                top: 8,
-                                right: 8,
-                                backgroundColor: "rgba(255,255,255,0.8)",
-                                borderRadius: "50%",
-                              }}
-                            >
-                              <Remove fontSize="small" />
-                            </IconButton>
-                            <CardContent>
-                              <Typography variant="subtitle2">
-                                {film.title}
-                              </Typography>
-                            </CardContent>
-                          </Card>
+                          <MovieCard
+                            film={film}
+                            onActionClick={() =>
+                              handleRemoveFilmFromListe(liste.id, film.id)
+                            }
+                            actionIcon={<Remove fontSize="small" />}
+                            actionColor="error"
+                          />
                         </Grid>
                       ))}
                     </Grid>
