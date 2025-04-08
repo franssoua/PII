@@ -280,10 +280,10 @@ function MovieDetails() {
                 ) : (
                   listes.map((liste) => (
                     <MenuItem
-                      key={liste.Id}
-                      onClick={() => handleAddToList(liste.Id)}
+                      key={liste.id}
+                      onClick={() => handleAddToList(liste.id)}
                     >
-                      {liste.Titre}
+                      {liste.titre}
                     </MenuItem>
                   ))
                 )}
