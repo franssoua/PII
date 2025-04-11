@@ -39,12 +39,8 @@ public class LoginDTO
 
 public class UpdateUtilisateurDTO
 {
-    [JsonPropertyName("Nom d'utilisateur")]
     public string? NomUtilisateur { get; set; }
-
-    [JsonPropertyName("Email")]
     public string? Email { get; set; }
-
-    [JsonPropertyName("Mot de passe")]
     public string? MotDePasse { get; set; }
+    public string? PhotoProfil { get; set; }
 }

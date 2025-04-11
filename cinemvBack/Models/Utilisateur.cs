@@ -65,6 +65,11 @@ public class Utilisateur
         {
             MotDePasse = HashPassword(updateUtilisateurDTO.MotDePasse);
         }
+
+        if (!string.IsNullOrEmpty(updateUtilisateurDTO.PhotoProfil))
+        {
+            PhotoProfil = updateUtilisateurDTO.PhotoProfil;
+        }
     }
 
     private static string HashPassword(string motDePasse)
