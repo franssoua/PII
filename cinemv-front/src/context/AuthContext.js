@@ -55,7 +55,6 @@ export const AuthProvider = ({ children }) => {
 
   const updateUserLocally = (updatedUser) => {
     setUser(updatedUser);
-    // Tu peux aussi remettre à jour le localStorage si tu t'en sers ailleurs
     localStorage.setItem("user", JSON.stringify(updatedUser));
   };
 

@@ -44,6 +44,20 @@ export const register = async (userData) => {
   return response.data;
 };
 
+export const getAllUtilisateurs = async () => {
+  try {
+    const response = await axios.get("http://localhost:5180/api/utilisateur", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Erreur lors de la récupération des utilisateurs :", error);
+    return [];
+  }
+};
+
 export const getUtilisateurById = async (id) => {
   try {
     const response = await api.get(`/utilisateur/${id}`);
@@ -56,14 +70,28 @@ export const getUtilisateurById = async (id) => {
 
 export const updateUtilisateur = async (id, data) => {
   try {
-    await axios.put(`http://localhost:5180/api/utilisateur/${id}`, data, {
+    const response = await api.put(`/utilisateur/${id}`, data, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
         "Content-Type": "application/json",
       },
     });
+    return response.data;
   } catch (error) {
     console.error("Erreur lors de la mise à jour de l'utilisateur :", error);
+  }
+};
+
+export const deleteUtilisateur = async (id) => {
+  try {
+    await axios.delete(`http://localhost:5180/api/utilisateur/${id}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+  } catch (error) {
+    console.error("Erreur lors de la suppression de l'utilisateur :", error);
+    throw error;
   }
 };
 

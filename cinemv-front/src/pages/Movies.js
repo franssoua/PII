@@ -54,7 +54,33 @@ function Movies() {
         label="Rechercher un film..."
         variant="outlined"
         fullWidth
-        sx={{ marginBottom: 3 }}
+        sx={{
+          mt: 3,
+          mb: 5,
+          backgroundColor: "white",
+          borderRadius: 1,
+          boxShadow: 2,
+          "& label.Mui-focused": {
+            color: "#074d34",
+          },
+          "& .MuiOutlinedInput-root": {
+            "& fieldset": {
+              borderColor: "#095d40",
+            },
+            "&:hover fieldset": {
+              borderColor: "#074d34",
+            },
+            "&.Mui-focused fieldset": {
+              borderColor: "#095d40",
+            },
+          },
+          "& .MuiInputLabel-root": {
+            color: "#095d40",
+          },
+          "& .MuiInputBase-input": {
+            color: "#095d40",
+          },
+        }}
         onChange={handleSearch}
       />
 
@@ -104,7 +130,7 @@ function Movies() {
         slidesPerView={5}
         pagination={{ clickable: true }}
         modules={[Pagination]}
-        style={{ paddingBottom: "20px" }}
+        style={{ paddingBottom: "50px", position: "relative" }}
       >
         {currentMovies.map((movie) => (
           <SwiperSlide key={movie.id}>
@@ -146,7 +172,7 @@ function Movies() {
         slidesPerView={5}
         pagination={{ clickable: true }}
         modules={[Pagination]}
-        style={{ paddingBottom: "20px" }}
+        style={{ paddingBottom: "50px", position: "relative" }}
       >
         {popularMovies.map((movie) => (
           <SwiperSlide key={movie.id}>

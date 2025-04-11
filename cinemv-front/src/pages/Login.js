@@ -13,7 +13,7 @@ const Login = () => {
     e.preventDefault();
     try {
       await login(email, password);
-      navigate("/"); // Redirection après connexion
+      navigate("/movies"); // Redirection après connexion
     } catch (error) {
       alert("Échec de connexion, vérifiez vos identifiants !");
     }
@@ -22,7 +22,14 @@ const Login = () => {
   return (
     <Container maxWidth="sm">
       <Box
-        sx={{ mt: 5, p: 3, boxShadow: 3, borderRadius: 2, bgcolor: "white" }}
+        sx={{
+          mb: 21,
+          mt: 5,
+          p: 3,
+          boxShadow: 3,
+          borderRadius: 2,
+          bgcolor: "white",
+        }}
       >
         <Typography variant="h4" gutterBottom>
           Connexion
@@ -36,6 +43,17 @@ const Login = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            sx={{
+              "& label": { color: "#095d40" },
+              "& label.Mui-focused": {
+                color: "#074d34",
+              },
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": { borderColor: "#095d40" },
+                "&:hover fieldset": { borderColor: "#074d34" },
+                "&.Mui-focused fieldset": { borderColor: "#074d34" },
+              },
+            }}
           />
           <TextField
             type="password"
@@ -45,13 +63,29 @@ const Login = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            sx={{
+              "& label": { color: "#095d40" },
+              "& label.Mui-focused": {
+                color: "#074d34",
+              },
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": { borderColor: "#095d40" },
+                "&:hover fieldset": { borderColor: "#074d34" },
+                "&.Mui-focused fieldset": { borderColor: "#074d34" },
+              },
+            }}
           />
           <Button
             type="submit"
             variant="contained"
             color="primary"
             fullWidth
-            sx={{ mt: 2 }}
+            sx={{
+              mt: 2,
+              backgroundColor: "#095d40",
+              color: "white",
+              "&:hover": { backgroundColor: "#074d34" },
+            }}
           >
             Se connecter
           </Button>

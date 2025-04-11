@@ -16,6 +16,7 @@ import {
 } from "../services/api";
 import {
   Container,
+  Box,
   Typography,
   Button,
   Grid,
@@ -43,6 +44,9 @@ function Profile() {
   const [avis, setAvis] = useState([]);
   const [listes, setListes] = useState([]);
   const navigate = useNavigate();
+  const [editCredentials, setEditCredentials] = useState(false);
+  const [newNom, setNewNom] = useState("");
+  const [newPassword, setNewPassword] = useState("");
 
   const fetchAvis = useCallback(async () => {
     if (!user?.id) return;
@@ -103,6 +107,7 @@ function Profile() {
 
     const fetchFavoris = async () => {
       if (user) {
+        setNewNom(user.nomUtilisateur || "");
         const allFavoris = await recupererFavoris();
         const userFavoris = allFavoris.find((f) => f.utilisateurId === user.id);
         if (userFavoris) {
@@ -201,30 +206,136 @@ function Profile() {
 
   return (
     <div style={{ textAlign: "center", marginTop: "2rem" }}>
-      <Typography variant="h4" gutterBottom>
-        Profil de {user.nomUtilisateur}
-      </Typography>
-      <div
-        style={{
-          height: "100px",
-          width: "100px",
-          borderRadius: "50%",
-          backgroundImage: `url(${
-            user.photoProfil || "/images/Default_pfp.svg.webp"
-          })`,
-          backgroundPosition: "center",
-          backgroundSize: "cover",
+      <Box
+        sx={{
+          width: "100%",
+          maxWidth: 400,
+          mx: "auto",
+          mt: 4,
+          mb: 4,
+          p: 3,
+          borderRadius: 2,
+          backgroundColor: "white",
+          boxShadow: 3,
+          textAlign: "center",
         }}
-      ></div>
-      <Button className="bg-green" onClick={handleUpdatePhotoProfil}>
-        Modifier la photo de profil
-      </Button>
+      >
+        <img
+          src={user.photoProfil || "/images/Default_pfp.svg.webp"}
+          alt="Profil"
+          style={{
+            width: "120px",
+            height: "120px",
+            borderRadius: "50%",
+            objectFit: "cover",
+            marginBottom: "1rem",
+            border: "3px solid #095d40",
+          }}
+        />
+        <Typography variant="h5" gutterBottom sx={{ fontWeight: "bold" }}>
+          {user.nomUtilisateur}
+        </Typography>
+        <Grid container spacing={2} justifyContent="center" sx={{ mb: 2 }}>
+          <Grid item>
+            <Button
+              variant="contained"
+              sx={{
+                backgroundColor: "#095d40",
+                "&:hover": { backgroundColor: "#074d34" },
+              }}
+              onClick={handleUpdatePhotoProfil}
+            >
+              Modifier la photo
+            </Button>
+          </Grid>
+          <Grid item>
+            <Button
+              variant="outlined"
+              sx={{ borderColor: "#095d40", color: "#095d40" }}
+              onClick={() => setEditCredentials(!editCredentials)}
+            >
+              {editCredentials ? "Annuler" : "Modifier mes identifiants"}
+            </Button>
+          </Grid>
+        </Grid>
+
+        {editCredentials && (
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              try {
+                const payload = {
+                  nomUtilisateur: newNom,
+                };
+                if (newPassword) payload.motDePasse = newPassword;
+
+                await updateUtilisateur(user.id, payload);
+                updateUserLocally({ ...user, nomUtilisateur: newNom });
+                alert("Identifiants mis à jour !");
+                setEditCredentials(false);
+              } catch (err) {
+                alert("Erreur lors de la mise à jour.");
+              }
+            }}
+          >
+            <input
+              type="text"
+              placeholder="Nouveau pseudo"
+              value={newNom}
+              onChange={(e) => setNewNom(e.target.value)}
+              style={{
+                padding: "0.5rem",
+                marginBottom: "0.5rem",
+                width: "100%",
+                borderRadius: "4px",
+                border: "1px solid #ccc",
+              }}
+            />
+            <input
+              type="password"
+              placeholder="Nouveau mot de passe (optionnel)"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              style={{
+                padding: "0.5rem",
+                marginBottom: "0.5rem",
+                width: "100%",
+                borderRadius: "4px",
+                border: "1px solid #ccc",
+              }}
+            />
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{
+                backgroundColor: "#095d40",
+                "&:hover": { backgroundColor: "#074d34" },
+              }}
+            >
+              Enregistrer
+            </Button>
+          </form>
+        )}
+      </Box>
 
       <Tabs
         value={tabIndex}
         onChange={(e, newIndex) => setTabIndex(newIndex)}
         centered
-        sx={{ mb: 3 }}
+        sx={{
+          mb: 3,
+          "& .MuiTabs-indicator": {
+            backgroundColor: "#095d40",
+          },
+          "& .MuiTab-root": {
+            color: "#095d40",
+            fontWeight: "bold",
+          },
+          "& .MuiTab-root.Mui-selected": {
+            color: "#095d40",
+          },
+        }}
       >
         <Tab label="Favoris" />
         <Tab label="Avis" />
@@ -236,7 +347,11 @@ function Profile() {
           variant="contained"
           color="primary"
           onClick={() => setShowFavoris((prev) => !prev)}
-          sx={{ mb: 3 }}
+          sx={{
+            backgroundColor: "#095d40",
+            "&:hover": { backgroundColor: "#074d34" },
+            mb: 4,
+          }}
         >
           {showFavoris ? "Cacher les favoris" : "Voir mes favoris"}
         </Button>
@@ -262,13 +377,13 @@ function Profile() {
       )}
 
       {tabIndex === 1 && (
-        <Grid container spacing={2} justifyContent="center">
+        <Grid container justifyContent="center">
           {avis.length === 0 ? (
             <Typography>Aucun avis posté.</Typography>
           ) : (
             avis.map((a) =>
               a.film ? (
-                <Grid item key={a.id || a.noteId} xs={12} sm={6} md={4}>
+                <Grid item key={a.id || a.noteId} xs={12} sm={6} md={3.5}>
                   <AvisCard
                     lien={`/movie/${a.film.id}`}
                     imageSrc={`https://image.tmdb.org/t/p/w200${a.film.poster_path}`}
@@ -323,7 +438,11 @@ function Profile() {
                 fetchListes();
               }
             }}
-            sx={{ mb: 3 }}
+            sx={{
+              backgroundColor: "#095d40",
+              "&:hover": { backgroundColor: "#074d34" },
+              mb: 4,
+            }}
           >
             Nouvelle liste
           </Button>
@@ -361,7 +480,7 @@ function Profile() {
                         color="primary"
                         size="small"
                         onClick={() => navigate("/movies")}
-                        sx={{ mt: 1 }}
+                        sx={{ borderColor: "#095d40", color: "#095d40" }}
                       >
                         Ajouter des films
                       </Button>

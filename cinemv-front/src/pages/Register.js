@@ -1,6 +1,5 @@
-import { useState, useContext } from "react";
+import { useState } from "react";
 import { TextField, Button, Container, Typography, Box } from "@mui/material";
-import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { register } from "../services/api";
 
@@ -8,7 +7,6 @@ function Register() {
   const [nomUtilisateur, setNomUtilisateur] = useState("");
   const [email, setEmail] = useState("");
   const [motDePasse, setMotDePasse] = useState("");
-  const { login } = useContext(AuthContext); // Pour se connecter directement après inscription
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -19,8 +17,7 @@ function Register() {
         Email: email,
         MotDePasse: motDePasse,
       });
-      await login(email, motDePasse); // Connexion automatique après l'inscription
-      navigate("/"); // Redirige vers la page d'accueil
+      navigate("/login");
     } catch (error) {
       alert("Erreur lors de l'inscription. Vérifiez vos informations.");
     }
@@ -29,7 +26,14 @@ function Register() {
   return (
     <Container maxWidth="sm">
       <Box
-        sx={{ mt: 5, p: 3, boxShadow: 3, borderRadius: 2, bgcolor: "white" }}
+        sx={{
+          mb: 11,
+          mt: 5,
+          p: 3,
+          boxShadow: 3,
+          borderRadius: 2,
+          bgcolor: "white",
+        }}
       >
         <Typography variant="h4" gutterBottom>
           Inscription
@@ -42,6 +46,17 @@ function Register() {
             value={nomUtilisateur}
             onChange={(e) => setNomUtilisateur(e.target.value)}
             required
+            sx={{
+              "& label": { color: "#095d40" },
+              "& label.Mui-focused": {
+                color: "#074d34",
+              },
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": { borderColor: "#095d40" },
+                "&:hover fieldset": { borderColor: "#074d34" },
+                "&.Mui-focused fieldset": { borderColor: "#074d34" },
+              },
+            }}
           />
           <TextField
             label="Email"
@@ -51,6 +66,17 @@ function Register() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            sx={{
+              "& label": { color: "#095d40" },
+              "& label.Mui-focused": {
+                color: "#074d34",
+              },
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": { borderColor: "#095d40" },
+                "&:hover fieldset": { borderColor: "#074d34" },
+                "&.Mui-focused fieldset": { borderColor: "#074d34" },
+              },
+            }}
           />
           <TextField
             label="Mot de passe"
@@ -60,13 +86,29 @@ function Register() {
             value={motDePasse}
             onChange={(e) => setMotDePasse(e.target.value)}
             required
+            sx={{
+              "& label": { color: "#095d40" },
+              "& label.Mui-focused": {
+                color: "#074d34",
+              },
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": { borderColor: "#095d40" },
+                "&:hover fieldset": { borderColor: "#074d34" },
+                "&.Mui-focused fieldset": { borderColor: "#074d34" },
+              },
+            }}
           />
           <Button
             type="submit"
             variant="contained"
             color="primary"
             fullWidth
-            sx={{ mt: 2 }}
+            sx={{
+              mt: 2,
+              backgroundColor: "#095d40",
+              color: "white",
+              "&:hover": { backgroundColor: "#074d34" },
+            }}
           >
             S'inscrire
           </Button>

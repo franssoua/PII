@@ -22,7 +22,6 @@ import {
   TextField,
   Button,
   List,
-  ListItem,
   Rating,
   IconButton,
   Menu,
@@ -230,7 +229,10 @@ function MovieDetails() {
               <Button
                 variant="outlined"
                 onClick={handleMenuOpen}
-                sx={{ mt: 1 }}
+                sx={{
+                  borderColor: "#095d40",
+                  color: "#095d40",
+                }}
               >
                 Ajouter
               </Button>
@@ -274,13 +276,39 @@ function MovieDetails() {
               variant="outlined"
               value={commentaire}
               onChange={(e) => setCommentaire(e.target.value)}
-              sx={{ marginTop: 2 }}
+              sx={{
+                marginTop: 2,
+                "& label": {
+                  color: "#095d40",
+                },
+                "& label.Mui-focused": {
+                  color: "#074d34",
+                },
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": {
+                    borderColor: "#095d40",
+                  },
+                  "&:hover fieldset": {
+                    borderColor: "#074d34",
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#074d34",
+                  },
+                },
+              }}
             />
             <Button
               type="submit"
               variant="contained"
               color="primary"
-              sx={{ marginTop: 2 }}
+              sx={{
+                mt: 1,
+                backgroundColor: "#095d40",
+                color: "#fff",
+                "&:hover": {
+                  backgroundColor: "#074d34",
+                },
+              }}
             >
               Envoyer
             </Button>
@@ -292,8 +320,10 @@ function MovieDetails() {
         </Typography>
       )}
 
-      <Container sx={{ marginTop: 4 }}>
-        <Typography variant="h5">Avis des spectateurs</Typography>
+      <Container maxWidth="md" sx={{ marginTop: 4 }}>
+        <Typography variant="h5" gutterBottom>
+          Avis des spectateurs
+        </Typography>
         {affichageFinal.length === 0 ? (
           <Typography>Aucun avis ou note pour ce film.</Typography>
         ) : (
@@ -309,7 +339,16 @@ function MovieDetails() {
                 "/images/Default_pfp.svg.webp";
 
               return (
-                <ListItem key={utilisateurId}>
+                <Card
+                  key={utilisateurId}
+                  sx={{
+                    mb: 2,
+                    p: 2,
+                    backgroundColor: "white",
+                    borderRadius: 2,
+                    boxShadow: 2,
+                  }}
+                >
                   <AvisCard
                     lien={`/user/${utilisateurId}`}
                     imageSrc={photoProfil}
@@ -340,7 +379,7 @@ function MovieDetails() {
                     onDeleteNote={() => handleDeleteNote(note?.id, fetchData)}
                     layout="list"
                   />
-                </ListItem>
+                </Card>
               );
             })}
           </List>
