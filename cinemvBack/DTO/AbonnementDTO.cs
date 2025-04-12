@@ -1,3 +1,4 @@
+// Sert à transmettre les données d’un abonnement entre deux utilisateurs
 public class AbonnementDTO
 {
     public int SuiveurId { get; set; }

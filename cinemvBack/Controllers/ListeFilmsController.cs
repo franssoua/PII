@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace cinemvBack.Controllers;
 
+// Contrôleur pour les listes personnalisées de films d’un utilisateur
 [ApiController]
 [Route("api/listeFilms")]
 public class ListeFilmsController : ControllerBase
@@ -17,6 +18,7 @@ public class ListeFilmsController : ControllerBase
         _context = context;
     }
 
+    //Route pour récupérer toutes les listes
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ListeFilmsDTO>>> GetListeFilms()
     {
@@ -24,6 +26,7 @@ public class ListeFilmsController : ControllerBase
         return await listesFilms.ToListAsync();
     }
 
+    //Route pour récupérer une liste spécifique
     [HttpGet("{id}")]
     public async Task<ActionResult<ListeFilmsDTO>> GetUtilisateur(int id)
     {
@@ -35,6 +38,7 @@ public class ListeFilmsController : ControllerBase
         return new ListeFilmsDTO(listeFilms);
     }
 
+    //Route pour récupérer les listes d'un utilisateur
     [HttpGet("utilisateur/{utilisateurId}")]
     public async Task<ActionResult<IEnumerable<ListeFilmsDTO>>> GetListesByUtilisateur(
         int utilisateurId
@@ -48,6 +52,7 @@ public class ListeFilmsController : ControllerBase
         return Ok(dtoListes);
     }
 
+    //Route pour créer une liste
     [HttpPost]
     [Authorize]
     public async Task<IActionResult> CreateList(ListeFilmsDTO listeFilmsDTO)
@@ -90,6 +95,7 @@ public class ListeFilmsController : ControllerBase
         );
     }
 
+    //Route pour modifier une liste
     [HttpPut("{id}")]
     [Authorize]
     public async Task<IActionResult> UpdateList(int id, [FromBody] ListeFilmsDTO listeFilmsDTO)
@@ -121,6 +127,7 @@ public class ListeFilmsController : ControllerBase
         return Ok("Liste mise à jour avec succès.");
     }
 
+    //Route pour supprimer une liste
     [HttpDelete("{id}")]
     [Authorize]
     public async Task<IActionResult> DeleteList(int id)
@@ -153,6 +160,7 @@ public class ListeFilmsController : ControllerBase
         return Ok("Liste supprimée avec succès.");
     }
 
+    //Route pour ajouter un film à une de ses listes
     [HttpPost("{id}/ajouterFilm")]
     [Authorize]
     public async Task<IActionResult> AjouterFilm(int id, [FromBody] string filmId)
@@ -187,6 +195,7 @@ public class ListeFilmsController : ControllerBase
         return Ok("Film ajouté à la liste avec succès.");
     }
 
+    //Route pour retirer un film d'une liste
     [HttpPost("{id}/supprimerFilm")]
     [Authorize]
     public async Task<IActionResult> SupprimerFilm(int id, [FromBody] string filmId)

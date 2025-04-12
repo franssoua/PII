@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 
+// Représente un avis écrit par un utilisateur pour un film
 public class AvisDTO
 {
     public int Id { get; set; }

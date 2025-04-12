@@ -1,11 +1,11 @@
 using System.Security.Claims;
-using cinemvBack.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace cinemvBack.Controllers;
 
+// Contrôleur pour la gestion des abonnements entre utilisateurs
 [ApiController]
 [Route("api/abonnement")]
 public class AbonnementController : ControllerBase
@@ -17,6 +17,7 @@ public class AbonnementController : ControllerBase
         _context = context;
     }
 
+    //Route pour récupérer tous les abonnements et abonnés de chaque utilisateurs
     [HttpGet("liste")]
     public async Task<IActionResult> GetAbonnementsEtAbonnes()
     {
@@ -39,6 +40,7 @@ public class AbonnementController : ControllerBase
         return Ok(result);
     }
 
+    //Route pour ajouter un utilisateur à ses abonnements
     [HttpPost("ajouter")]
     [Authorize]
     public async Task<IActionResult> AjouterAbonnement(AbonnementDTO abonnementDTO)
@@ -75,6 +77,7 @@ public class AbonnementController : ControllerBase
         return BadRequest("Vous êtes déjà abonné à cet utilisateur.");
     }
 
+    //Route pour retirer un utilisateur de ses abonnements
     [HttpDelete("supprimer")]
     [Authorize]
     public async Task<IActionResult> SupprimerAbonnement(AbonnementDTO abonnementDTO)

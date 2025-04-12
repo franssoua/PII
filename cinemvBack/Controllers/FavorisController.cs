@@ -1,11 +1,11 @@
 using System.Security.Claims;
-using cinemvBack.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace cinemvBack.Controllers;
 
+// Contrôleur pour la gestion des films favoris d’un utilisateur
 [ApiController]
 [Route("api/favoris")]
 public class FavorisController : ControllerBase
@@ -17,6 +17,7 @@ public class FavorisController : ControllerBase
         _context = context;
     }
 
+    //Route pour récupérer tous les films mis en favoris par les utilisateurs
     [HttpGet("liste")]
     public async Task<IActionResult> GetFilmsFavoris()
     {
@@ -32,6 +33,7 @@ public class FavorisController : ControllerBase
         return Ok(result);
     }
 
+    //Route pour ajouter un film aux favoris
     [HttpPost("ajouter")]
     [Authorize]
     public async Task<IActionResult> AjouterFilmFavoris(FavorisDTO favorisDTO)
@@ -59,6 +61,7 @@ public class FavorisController : ControllerBase
         return BadRequest("Le film est déjà dans les favoris.");
     }
 
+    //Route pour retirer un film des favoris
     [HttpDelete("supprimer")]
     [Authorize]
     public async Task<IActionResult> SupprimerFilmFavoris(FavorisDTO favorisDTO)

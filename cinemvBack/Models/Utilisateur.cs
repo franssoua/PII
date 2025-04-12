@@ -1,3 +1,4 @@
+// Modèle principal représentant un utilisateur de l'application.
 namespace cinemvBack.Models;
 
 using BCrypt.Net;
@@ -33,6 +34,7 @@ public class Utilisateur
         IsAdmin = utilisateurDTO.IsAdmin;
     }
 
+    // transforme un RegisterDTO en Utilisateur, avec mot de passe hashé.
     public static Utilisateur FromDto(RegisterDTO registerDTO)
     {
         return new Utilisateur
@@ -44,11 +46,13 @@ public class Utilisateur
         };
     }
 
+    // vérifie la validité du mot de passe via BCrypt.
     public bool VerifyPassword(string plainPassword)
     {
         return BCrypt.Verify(plainPassword, this.MotDePasse);
     }
 
+    //met à jour les données de l’utilisateur.
     public void UpdateFromDTO(UpdateUtilisateurDTO updateUtilisateurDTO)
     {
         if (!string.IsNullOrEmpty(updateUtilisateurDTO.NomUtilisateur))
@@ -77,6 +81,7 @@ public class Utilisateur
         return BCrypt.HashPassword(motDePasse);
     }
 
+    //gestion des abonnements
     public bool AjouterAbonnement(Utilisateur utilisateur)
     {
         if (!Abonnements.Contains(utilisateur))
@@ -92,6 +97,7 @@ public class Utilisateur
         return Abonnements.Remove(utilisateur);
     }
 
+    //gestion des favoris
     public bool AjouterFilmFavoris(string filmId)
     {
         if (!FavorisFilmsIds.Contains(filmId))

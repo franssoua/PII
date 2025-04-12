@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+// Contrôleur dédié à la gestion des notes de films
 [ApiController]
 [Route("api/note")]
 public class NoteController : ControllerBase
@@ -14,6 +15,7 @@ public class NoteController : ControllerBase
         _context = context;
     }
 
+    //Route pour récupérer une note spécifique
     [HttpGet("{id}")]
     public async Task<IActionResult> GetNote(int id)
     {
@@ -26,6 +28,7 @@ public class NoteController : ControllerBase
         return Ok(new NoteDTO(note));
     }
 
+    //Route pour récupérer les notes d'un film
     [HttpGet("film/{filmId}")]
     public async Task<IActionResult> GetNotesByFilm(string filmId)
     {
@@ -37,6 +40,7 @@ public class NoteController : ControllerBase
         return Ok(notes.Select(a => new NoteDTO(a)).ToList());
     }
 
+    //Route pour récupérer les notes d'un utilisateur
     [HttpGet("utilisateur/{utilisateurId}")]
     public async Task<IActionResult> GetNotessByUtilisateur(int utilisateurId)
     {
@@ -53,6 +57,7 @@ public class NoteController : ControllerBase
         return Ok(noteDTO);
     }
 
+    //Route pour ajouter une note
     [HttpPost]
     [Authorize]
     public async Task<IActionResult> AjouterNote(NoteDTO noteDTO)
@@ -106,6 +111,7 @@ public class NoteController : ControllerBase
         return Ok(new NoteDTO(note));
     }
 
+    //Route pour modifier une note
     [HttpPut("{id}")]
     [Authorize]
     public async Task<IActionResult> ModifierNote(int id, NoteDTO noteDTO)
@@ -144,6 +150,7 @@ public class NoteController : ControllerBase
         return Ok(new NoteDTO(note));
     }
 
+    //Route pour supprimer une note
     [HttpDelete("{id}")]
     [Authorize]
     public async Task<IActionResult> SupprimerNote(int id)

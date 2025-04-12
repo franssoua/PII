@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+// Contrôleur permettant la gestion des avis/commentaires des utilisateurs
 [ApiController]
 [Route("api/avis")]
 public class AvisController : ControllerBase
@@ -14,6 +15,7 @@ public class AvisController : ControllerBase
         _context = context;
     }
 
+    //Route pour récupérer un avis spécifique
     [HttpGet("{id}")]
     public async Task<IActionResult> GetAvis(int id)
     {
@@ -26,6 +28,7 @@ public class AvisController : ControllerBase
         return Ok(new AvisDTO(avis));
     }
 
+    //Route pour récupérer tous les avis d'un film spécifique
     [HttpGet("film/{filmId}")]
     public async Task<IActionResult> GetAvisByFilm(string filmId)
     {
@@ -42,6 +45,7 @@ public class AvisController : ControllerBase
         return Ok(avisDTO);
     }
 
+    //Route pour récupérer tous les avis d'un utilisateur spécifique
     [HttpGet("utilisateur/{utilisateurId}")]
     public async Task<IActionResult> GetAvisByUtilisateur(int utilisateurId)
     {
@@ -58,6 +62,7 @@ public class AvisController : ControllerBase
         return Ok(avisDTO);
     }
 
+    //Route pour poster un avis
     [HttpPost]
     [Authorize]
     public async Task<IActionResult> AjouterAvis(AvisDTO avisDTO)
@@ -107,6 +112,7 @@ public class AvisController : ControllerBase
         return Ok(new AvisDTO(avis));
     }
 
+    //Route pour modifier un avis
     [HttpPut("{id}")]
     [Authorize]
     public async Task<IActionResult> ModifierAvis(int id, AvisDTO avisDTO)
@@ -140,6 +146,7 @@ public class AvisController : ControllerBase
         return Ok(new AvisDTO(avis));
     }
 
+    //Route pour supprimer un avis
     [HttpDelete("{id}")]
     [Authorize]
     public async Task<IActionResult> SupprimerAvis(int id)

@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 
+// Représente une note laissée par un utilisateur sur un film
 public class NoteDTO
 {
     public int Id { get; set; }

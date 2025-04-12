@@ -1,6 +1,6 @@
-using System.Text.Json.Serialization;
 using cinemvBack.Models;
 
+// Représente un utilisateur sous forme simplifiée pour les transferts de données
 public class UtilisateurDTO
 {
     public int Id { get; set; }
@@ -23,6 +23,7 @@ public class UtilisateurDTO
     }
 }
 
+// Utilisé lors de l'inscription d’un nouvel utilisateur
 public class RegisterDTO
 {
     public string NomUtilisateur { get; set; } = null!;
@@ -31,12 +32,14 @@ public class RegisterDTO
     public DateTime DateInscription { get; set; }
 }
 
+// Utilisé pour la connexion d’un utilisateur avec email et mot de passe
 public class LoginDTO
 {
     public string Email { get; set; } = null!;
     public string Password { get; set; } = null!;
 }
 
+// Utilisé pour mettre à jour un utilisateur (nom, email, mot de passe ou photo)
 public class UpdateUtilisateurDTO
 {
     public string? NomUtilisateur { get; set; }

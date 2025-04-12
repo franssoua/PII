@@ -1,3 +1,4 @@
+// Représente un lien d’abonnement entre deux utilisateurs (suiveur et suivi)
 using cinemvBack.Models;
 
 public class Abonnement

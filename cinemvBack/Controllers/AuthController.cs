@@ -1,11 +1,8 @@
-using System;
-using System.Threading.Tasks;
-using cinemvBack.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
+// Contrôleur d’authentification simplifiée pour générer un JWT
 [Route("api/auth")]
 [ApiController]
 public class AuthController : ControllerBase
@@ -25,8 +22,7 @@ public class AuthController : ControllerBase
         _context = context;
     }
 
-    // GET: Vérifier si l'utilisateur courant est admin
-    // Cette action nécessite que l'utilisateur soit authentifié pour que User soit correctement renseigné.
+    //Route pour vérifier si l'utilisateur est admin
     [HttpGet("isadmin")]
     [Authorize]
     public IActionResult IsAdmin()
@@ -35,7 +31,7 @@ public class AuthController : ControllerBase
         return Ok(new { isAdmin });
     }
 
-    // POST: Authentifier un utilisateur et générer un token JWT
+    //Route pour authentifier un utilisateur et générer un token JWT
     [HttpPost("login")]
     public async Task<ActionResult<AuthResponse>> Login([FromBody] AuthRequest request)
     {

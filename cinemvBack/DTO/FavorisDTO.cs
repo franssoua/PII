@@ -1,3 +1,4 @@
+// Utilisé pour transmettre l’information d’un film ajouté en favoris par un utilisateur
 public class FavorisDTO
 {
     public int UtilisateurId { get; set; }

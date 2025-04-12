@@ -1,3 +1,4 @@
+// Représente un lien entre un utilisateur et un film ajouté à ses favoris
 using cinemvBack.Models;
 
 public class Favoris

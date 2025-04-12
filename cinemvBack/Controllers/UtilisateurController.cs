@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace cinemvBack.Controllers;
 
+// Contrôleur principal pour la gestion des utilisateurs
 [ApiController]
 [Route("api/utilisateur")]
 public class UtilisateurController : ControllerBase
@@ -25,6 +26,7 @@ public class UtilisateurController : ControllerBase
         _context = context;
     }
 
+    //Route pour récupérer tous les utilisateurs
     [HttpGet]
     public async Task<ActionResult<IEnumerable<UtilisateurDTO>>> GetUtilisateurs()
     {
@@ -32,6 +34,7 @@ public class UtilisateurController : ControllerBase
         return await utilisateurs.ToListAsync();
     }
 
+    //Route pour récupérer un utilisateur spécifique
     [HttpGet("{id}")]
     public async Task<ActionResult<UtilisateurDTO>> GetUtilisateur(int id)
     {
@@ -43,6 +46,7 @@ public class UtilisateurController : ControllerBase
         return new UtilisateurDTO(utilisateur);
     }
 
+    //Route pour récupérer le profil courant
     [HttpGet("me")]
     [Authorize]
     public async Task<ActionResult<UtilisateurDTO>> GetCurrentUser()
@@ -64,6 +68,7 @@ public class UtilisateurController : ControllerBase
         return Ok(new UtilisateurDTO(utilisateur));
     }
 
+    //Route pour tester si l'utilisateur est admin
     [HttpGet("isadmin")]
     [Authorize]
     public IActionResult IsAdmin()
@@ -72,6 +77,7 @@ public class UtilisateurController : ControllerBase
         return Ok(new { isAdmin });
     }
 
+    //Route pour s'enregistrer
     [HttpPost("register")]
     public async Task<IActionResult> Register(RegisterDTO registerDTO)
     {
@@ -92,6 +98,7 @@ public class UtilisateurController : ControllerBase
         return Ok("Utilisateur inscrit avec succès.");
     }
 
+    //Route pour se connecter
     [HttpPost("login")]
     public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginDTO loginDTO)
     {
@@ -127,6 +134,7 @@ public class UtilisateurController : ControllerBase
         }
     }
 
+    //Route modifier son compte
     [HttpPut("{id}")]
     [Authorize]
     public async Task<IActionResult> Update(int id, UpdateUtilisateurDTO updateUtilisateurDTO)
@@ -164,6 +172,7 @@ public class UtilisateurController : ControllerBase
         return Ok("Utilisateur mis à jour avec succès");
     }
 
+    //Route pour supprimer un utilisateur
     [HttpDelete("{id}")]
     [Authorize]
     public async Task<IActionResult> Delete(int id)

@@ -1,3 +1,4 @@
+// Modèle représentant un avis textuel laissé par un utilisateur sur un film
 using cinemvBack.Models;
 
 public class Avis

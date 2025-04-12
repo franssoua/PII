@@ -1,6 +1,6 @@
-using System.Text.Json.Serialization;
 using cinemvBack.Models;
 
+// Représente une liste personnalisée de films créée par un utilisateur
 public class ListeFilmsDTO
 {
     public int Id { get; set; }
