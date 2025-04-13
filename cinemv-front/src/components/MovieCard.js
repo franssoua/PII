@@ -1,3 +1,7 @@
+//Composant représentant un film sous forme de carte : 
+//  - Affiche l’affiche, le titre,
+//  - Peut contenir une icône d'action personnalisée (ex. : favoris, suppression),
+//  - Navigue vers la page de détails du film au clic
 import {
   Card,
   CardContent,
@@ -11,7 +15,7 @@ function MovieCard({
   film,
   onActionClick,
   actionIcon,
-  actionColor = "default", 
+  actionColor = "default",
   actionPosition = { top: 8, right: 8 },
 }) {
   return (

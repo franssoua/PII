@@ -1,3 +1,8 @@
+// Composant réutilisable qui affiche une carte contenant :
+//  - Les informations d'un film (titre, image),
+//  - L'avis et la note d'un utilisateur,
+//  - Les boutons d'édition et de suppression si c'est son propre avis
+// Ce composant s'affiche soit en format "card" (profil), soit en format "list" (page film)
 import { Card, CardMedia, IconButton, Typography, Rating } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
 import { Link } from "react-router-dom";

@@ -13,6 +13,7 @@ import PrivateRoute from "./components/PrivateRoute";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 
+// Gère la structure des routes avec React Router et encadre toutes les pages à l'aide des composants Header et Footer
 function AppContent() {
   return (
     <div className="flex flex-col min-h-screen">

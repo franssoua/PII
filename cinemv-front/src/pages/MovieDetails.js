@@ -1,3 +1,4 @@
+//Page d'affichage des détails d'un film
 import { useEffect, useState, useContext, useCallback } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useParams } from "react-router-dom";
@@ -37,6 +38,7 @@ import {
 } from "../utils/avisHandlers";
 
 function MovieDetails() {
+  //Initialisation des états et récupération de l'ID du film depuis l'URL
   const { id } = useParams();
   const [movie, setMovie] = useState(null);
   const [avis, setAvis] = useState([]);
@@ -49,6 +51,7 @@ function MovieDetails() {
   const [listes, setListes] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
 
+  //Récupération des données du film, des avis, des notes et des listes de l'utilisateur
   const fetchData = useCallback(async () => {
     const data = await getMovieDetails(id);
     setMovie(data);
@@ -82,6 +85,7 @@ function MovieDetails() {
     fetchData();
   }, [id, fetchData]);
 
+  //Gestion de l'envoi du formulaire d'avis et/ou de note
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -146,6 +150,7 @@ function MovieDetails() {
     }
   };
 
+  //Ajout ou retrait du film aux favoris
   const toggleFavoris = async () => {
     if (!user) return alert("Connextez-vous pour ajouter aux favoris.");
     if (isFavoris) {
@@ -157,6 +162,7 @@ function MovieDetails() {
     }
   };
 
+  //Menu déroulant pour ajouter le film à une liste existante
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -177,6 +183,7 @@ function MovieDetails() {
     }
   };
 
+  //Fusion des avis et notes pour éviter les doublons par utilisateur
   const utilisateursAvecAvisOuNote = {};
 
   avis.forEach((a) => {
@@ -201,6 +208,7 @@ function MovieDetails() {
 
   if (!movie) return <Typography align="center">Chargement...</Typography>;
 
+  //Rendu de la page : détails du film, formulaire d’avis et liste des avis/notes
   return (
     <Container sx={{ textAlign: "center", marginTop: 4 }}>
       <Typography variant="h3" gutterBottom>

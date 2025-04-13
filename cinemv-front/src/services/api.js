@@ -1,3 +1,4 @@
+//centralise toutes les fonctions d’appel à l’API backend et à l’API TMDB
 import config from "../config";
 import axios from "axios";
 const apiKey = config.apiKey;
@@ -17,6 +18,7 @@ const tmdbApi = axios.create({
   },
 });
 
+//Connecte l'utilisateur, enregistre le token dans le localStorage et le transmet dans les headers
 export const login = async (email, password) => {
   try {
     const response = await api.post(
@@ -39,11 +41,13 @@ export const login = async (email, password) => {
   }
 };
 
+// Inscription d'un utilisateur
 export const register = async (userData) => {
   const response = await api.post("/utilisateur/register", userData);
   return response.data;
 };
 
+//Retourne tous les utilisateurs
 export const getAllUtilisateurs = async () => {
   try {
     const response = await axios.get("http://localhost:5180/api/utilisateur", {
@@ -58,6 +62,7 @@ export const getAllUtilisateurs = async () => {
   }
 };
 
+//Récupère les données d’un utilisateur via son ID
 export const getUtilisateurById = async (id) => {
   try {
     const response = await api.get(`/utilisateur/${id}`);
@@ -68,6 +73,7 @@ export const getUtilisateurById = async (id) => {
   }
 };
 
+//Met à jour les infos d’un utilisateur
 export const updateUtilisateur = async (id, data) => {
   try {
     const response = await api.put(`/utilisateur/${id}`, data, {
@@ -82,6 +88,7 @@ export const updateUtilisateur = async (id, data) => {
   }
 };
 
+//Supprime un utilisateur
 export const deleteUtilisateur = async (id) => {
   try {
     await axios.delete(`http://localhost:5180/api/utilisateur/${id}`, {
@@ -95,6 +102,7 @@ export const deleteUtilisateur = async (id) => {
   }
 };
 
+// récupère les films actuellement au cinéma
 export const getCurrentMovies = async () => {
   try {
     const response = await tmdbApi.get("movie/now_playing");
@@ -105,6 +113,7 @@ export const getCurrentMovies = async () => {
   }
 };
 
+// récupère les films populaires
 export const getPopularMovies = async () => {
   try {
     const response = await tmdbApi.get("movie/popular");
@@ -115,6 +124,7 @@ export const getPopularMovies = async () => {
   }
 };
 
+//Recherche un film via une chaîne de caractères
 export const searchMovies = async (query) => {
   try {
     if (!query) return [];
@@ -130,6 +140,7 @@ export const searchMovies = async (query) => {
   }
 };
 
+//Récupère les détails d’un film à partir de son ID.
 export const getMovieDetails = async (id) => {
   try {
     const response = await tmdbApi.get(`movie/${id}`);
@@ -143,6 +154,7 @@ export const getMovieDetails = async (id) => {
   }
 };
 
+//Récupère les avis liés à un film 
 export const getAvisByFilm = async (filmId) => {
   try {
     const response = await axios.get(`${API_URL}/avis/film/${filmId}`);
@@ -153,6 +165,7 @@ export const getAvisByFilm = async (filmId) => {
   }
 };
 
+//Récupère les notes liés à un film 
 export const getNotesByFilm = async (filmId) => {
   try {
     const response = await axios.get(`${API_URL}/note/film/${filmId}`);
@@ -167,6 +180,7 @@ export const getNotesByFilm = async (filmId) => {
   }
 };
 
+//Ajoute un avis
 export const postAvis = async (contenu, utilisateurId, filmId) => {
   try {
     await axios.post(
@@ -185,11 +199,11 @@ export const postAvis = async (contenu, utilisateurId, filmId) => {
       }
     );
   } catch (error) {
-    //console.error("Erreur lors de l'ajout de l'avis :", error);
-    throw error;
+    console.error("Erreur lors de l'ajout de l'avis :", error);
   }
 };
 
+//Ajoute une note
 export const postNote = async (valeur, utilisateurId, filmId) => {
   if (valeur < 0 || valeur > 5) {
     console.error("Erreur : la note doit être comprise entre 0 et 5.");
@@ -225,11 +239,11 @@ export const postNote = async (valeur, utilisateurId, filmId) => {
       }
     );
   } catch (error) {
-    //console.error("Erreur lors de l'ajout de la note :", error);
-    throw error;
+    console.error("Erreur lors de l'ajout de la note :", error);
   }
 };
 
+//Met à jour une note
 export const updateNote = async (noteId, valeur, utilisateurId, filmId) => {
   try {
     await axios.put(
@@ -252,6 +266,7 @@ export const updateNote = async (noteId, valeur, utilisateurId, filmId) => {
   }
 };
 
+//Supprime une note
 export const deleteNote = async (noteId) => {
   try {
     await axios.delete(`${API_URL}/note/${noteId}`, {
@@ -264,6 +279,7 @@ export const deleteNote = async (noteId) => {
   }
 };
 
+//Met à jour un avis
 export const updateAvis = async (avisId, contenu, utilisateurId, filmId) => {
   try {
     await axios.put(
@@ -287,6 +303,7 @@ export const updateAvis = async (avisId, contenu, utilisateurId, filmId) => {
   }
 };
 
+//Supprime un avis
 export const deleteAvis = async (avisId) => {
   try {
     await axios.delete(`${API_URL}/avis/${avisId}`, {
@@ -299,6 +316,7 @@ export const deleteAvis = async (avisId) => {
   }
 };
 
+//Ajoute un film aux favoris d’un utilisateur
 export const ajouterFavoris = async (utilisateurId, filmId) => {
   try {
     await axios.post(
@@ -316,6 +334,7 @@ export const ajouterFavoris = async (utilisateurId, filmId) => {
   }
 };
 
+//Retire un film des favoris
 export const supprimerFavoris = async (utilisateurId, filmId) => {
   try {
     await axios.delete(`${API_URL}/favoris/supprimer`, {
@@ -330,6 +349,7 @@ export const supprimerFavoris = async (utilisateurId, filmId) => {
   }
 };
 
+//Récupère tous les favoris d'un utilisateur
 export const recupererFavoris = async () => {
   try {
     const response = await axios.get(`${API_URL}/favoris/liste`);
@@ -340,6 +360,7 @@ export const recupererFavoris = async () => {
   }
 };
 
+//Récupère les avis liés à un utilisateur
 export const getAvisByUtilisateur = async (utilisateurId) => {
   try {
     const response = await axios.get(
@@ -355,6 +376,7 @@ export const getAvisByUtilisateur = async (utilisateurId) => {
   }
 };
 
+//Récupère les notes liés à un utilisateur
 export const getNotesByUtilisateur = async (utilisateurId) => {
   try {
     const response = await axios.get(
@@ -370,27 +392,7 @@ export const getNotesByUtilisateur = async (utilisateurId) => {
   }
 };
 
-// export const getListesByUtilisateur = async (utilisateurId) => {
-//   try {
-//     const response = await axios.get(`http://localhost:5180/api/listeFilms`);
-//     const toutes = response.data.filter(
-//       (l) => l.utilisateurId === utilisateurId
-//     );
-
-//     // Récupérer les détails des films pour chaque liste
-//     for (const liste of toutes) {
-//       const films = await Promise.all(
-//         liste.filmsIds.map((id) => getMovieDetails(id))
-//       );
-//       liste.filmsDetails = films.filter((f) => f); // supprime les nulls
-//     }
-
-//     return toutes;
-//   } catch (error) {
-//     console.error("Erreur lors de la récupération des listes :", error);
-//     return [];
-//   }
-// };
+//Récupère toutes les listes personnalisées d’un utilisateur
 export const getListesByUtilisateur = async (utilisateurId) => {
   try {
     const response = await axios.get(
@@ -401,7 +403,7 @@ export const getListesByUtilisateur = async (utilisateurId) => {
       const films = await Promise.all(
         liste.filmsIds.map((id) => getMovieDetails(id))
       );
-      liste.filmsDetails = films.filter((f) => f); // supprime les nulls
+      liste.filmsDetails = films.filter((f) => f);
     }
 
     return response.data;
@@ -414,6 +416,7 @@ export const getListesByUtilisateur = async (utilisateurId) => {
   }
 };
 
+// Crée une nouvelle liste
 export const createListe = async ({ titre, description, utilisateurId }) => {
   try {
     await axios.post(
@@ -436,6 +439,7 @@ export const createListe = async ({ titre, description, utilisateurId }) => {
   }
 };
 
+//Met à jour une liste existante
 export const updateListe = async (listeId, data) => {
   try {
     await axios.put(`${API_URL}/listeFilms/${listeId}`, data, {
@@ -449,6 +453,7 @@ export const updateListe = async (listeId, data) => {
   }
 };
 
+//Supprime une liste
 export const deleteListe = async (listeId) => {
   try {
     await axios.delete(`${API_URL}/listeFilms/${listeId}`, {
@@ -461,11 +466,12 @@ export const deleteListe = async (listeId) => {
   }
 };
 
+//Ajoute un film dans une liste
 export const ajouterFilm = async (listeId, filmId) => {
   try {
     await axios.post(
       `http://localhost:5180/api/listeFilms/${listeId}/ajouterFilm`,
-      JSON.stringify(filmId), // car attendu en tant que string brute
+      JSON.stringify(filmId), 
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -479,6 +485,7 @@ export const ajouterFilm = async (listeId, filmId) => {
   }
 };
 
+//Retire un film d'une liste
 export const supprimerFilm = async (listeId, filmId) => {
   try {
     await axios.post(

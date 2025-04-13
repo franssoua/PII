@@ -1,3 +1,4 @@
+// Point d’entrée de l’application React (ReactDOM)
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";

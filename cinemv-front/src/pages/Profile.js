@@ -1,3 +1,4 @@
+//Page de profil de l'utilisateur connecté
 import { useContext, useEffect, useState, useCallback } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -37,6 +38,7 @@ import {
 } from "../utils/avisHandlers";
 
 function Profile() {
+  //Initialisation des états pour stocker les avis, favoris, listes, formulaire de modification...
   const { user, updateUserLocally } = useContext(AuthContext);
   const [favoris, setFavoris] = useState([]);
   const [showFavoris, setShowFavoris] = useState(false);
@@ -48,6 +50,7 @@ function Profile() {
   const [newNom, setNewNom] = useState("");
   const [newPassword, setNewPassword] = useState("");
 
+  //Récupération des avis et notes de l'utilisateur, fusionnés par film
   const fetchAvis = useCallback(async () => {
     if (!user?.id) return;
     const avisUtilisateur = await getAvisByUtilisateur(user.id);
@@ -91,6 +94,7 @@ function Profile() {
     setAvis(avisEtNotes);
   }, [user]);
 
+  //Récupération des listes de l'utilisateur connecté
   const fetchListes = useCallback(async () => {
     if (!user?.id) return;
 
@@ -102,6 +106,7 @@ function Profile() {
     }
   }, [user]);
 
+  //useEffect principal : déclenche les récupérations selon les onglets ou actions
   useEffect(() => {
     if (!user?.id) return;
 
@@ -135,6 +140,7 @@ function Profile() {
     }
   }, [tabIndex, showFavoris, user, fetchAvis, fetchListes]);
 
+  //Fonctions de suppression de favoris ou de films dans les listes
   const handleRemoveFavori = async (filmId) => {
     if (!user) return;
     await supprimerFavoris(user.id, String(filmId));
@@ -152,6 +158,7 @@ function Profile() {
     }
   };
 
+  //Gestion des actions sur les listes (création, mise à jour, suppression)
   const handleUpdateListe = async (liste) => {
     const nouveauTitre = prompt("Nouveau titre :", liste.titre);
     const nouvelleDescription = prompt(
@@ -189,6 +196,7 @@ function Profile() {
     }
   };
 
+  //Fonction de modification de la photo de profil
   const handleUpdatePhotoProfil = async () => {
     const newUrl = prompt("Entrez l’URL de votre nouvelle photo de profil :");
     if (newUrl) {
@@ -204,6 +212,7 @@ function Profile() {
       </Typography>
     );
 
+  //Affichage du composant principal : photo, pseudo, boutons
   return (
     <div style={{ textAlign: "center", marginTop: "2rem" }}>
       <Box

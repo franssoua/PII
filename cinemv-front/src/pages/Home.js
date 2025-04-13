@@ -1,3 +1,4 @@
+// Page d'accueil du site qui affiche différents boutons de navigation selon l’état de connexion
 import { Stack, Button, Container, Typography, Box } from "@mui/material";
 import { useContext } from "react";
 import { Link } from "react-router-dom";

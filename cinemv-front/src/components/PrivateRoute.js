@@ -1,3 +1,4 @@
+//Composant utilisé pour restreindre l'accès à certaines routes aux seuls administrateurs
 import { useContext } from "react";
 import { Navigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";

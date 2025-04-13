@@ -1,3 +1,4 @@
+//Composant affichant le pied de page du site
 import { Container, Typography, Box } from "@mui/material";
 
 function Footer() {

@@ -1,3 +1,5 @@
+//Permet de créer un compte utilisateur avec nom, email et mot de passe
+//Redirige vers la page de connexion après une inscription réussie
 import { useState } from "react";
 import { TextField, Button, Container, Typography, Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";

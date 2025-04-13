@@ -1,12 +1,7 @@
+//Page de profil public d’un autre utilisateur, ne permet pas d'interaction directe
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import {
-  Container,
-  Typography,
-  Card,
-  CardContent,
-  Grid,
-} from "@mui/material";
+import { Container, Typography, Card, CardContent, Grid } from "@mui/material";
 import {
   getUtilisateurById,
   getAvisByUtilisateur,
@@ -71,6 +66,7 @@ function VisitProfile() {
           height: 100,
           borderRadius: "50%",
           margin: "1rem 0",
+          border: "3px solid #095d40",
         }}
       />
 

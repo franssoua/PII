@@ -1,3 +1,4 @@
+//Fournit un contexte global d'authentification à toute l'application React
 import { createContext, useState, useEffect } from "react";
 import { api } from "../services/api";
 
@@ -6,6 +7,7 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
+  //gère l'état d'un utilisateur connecté
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -30,6 +32,7 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
+  //Authentifie un utilisateur
   const login = async (email, password) => {
     try {
       const response = await api.post("/utilisateur/login", {
@@ -47,12 +50,14 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  //Déconnecte l'utilisateur
   const logout = () => {
     localStorage.removeItem("token");
     delete api.defaults.headers.common["Authorization"];
     setUser(null);
   };
 
+  //Met à jour localement les infos utilisateur
   const updateUserLocally = (updatedUser) => {
     setUser(updatedUser);
     localStorage.setItem("user", JSON.stringify(updatedUser));

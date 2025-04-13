@@ -1,5 +1,7 @@
+// Regroupe des fonctions réutilisables pour gérer les actions liées aux avis et aux notes
 import { updateAvis, deleteAvis, updateNote, deleteNote } from "../services/api";
 
+// Affiche un prompt pour modifier le contenu d’un avis puis met à jour côté backend
 export const handleUpdateAvis = async (avisId, contenu, utilisateurId, filmId, refresh) => {
   const nouveauContenu = prompt("Modifier votre avis :", contenu);
   if (nouveauContenu) {
@@ -8,6 +10,7 @@ export const handleUpdateAvis = async (avisId, contenu, utilisateurId, filmId, r
   }
 };
 
+// Affiche une confirmation, puis supprime l'avis côté backend
 export const handleDeleteAvis = async (avisId, refresh) => {
   if (window.confirm("Voulez-vous vraiment supprimer cet avis ?")) {
     await deleteAvis(avisId);
@@ -15,6 +18,7 @@ export const handleDeleteAvis = async (avisId, refresh) => {
   }
 };
 
+// Permet de modifier une note (entre 0 et 5) avec validation et mise à jour backend
 export const handleUpdateNote = async (noteId, valeur, utilisateurId, filmId, refresh) => {
   const nouvelleValeur = prompt("Modifier votre note (entre 0 et 5) :", valeur);
   const parsedValeur = parseFloat(nouvelleValeur);
@@ -26,6 +30,7 @@ export const handleUpdateNote = async (noteId, valeur, utilisateurId, filmId, re
   }
 };
 
+// Supprime une note après confirmation de l'utilisateur
 export const handleDeleteNote = async (noteId, refresh) => {
   if (window.confirm("Voulez-vous vraiment supprimer cette note ?")) {
     await deleteNote(noteId);
