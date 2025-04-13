@@ -1,3 +1,4 @@
+// Middleware utilisé comme attribut pour restreindre l'accès à certaines routes
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
