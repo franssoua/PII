@@ -50,7 +50,7 @@ export const register = async (userData) => {
 //Retourne tous les utilisateurs
 export const getAllUtilisateurs = async () => {
   try {
-    const response = await axios.get("http://localhost:5180/api/utilisateur", {
+    const response = await api.get("/utilisateur", {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -91,7 +91,7 @@ export const updateUtilisateur = async (id, data) => {
 //Supprime un utilisateur
 export const deleteUtilisateur = async (id) => {
   try {
-    await axios.delete(`http://localhost:5180/api/utilisateur/${id}`, {
+    await api.delete(`/utilisateur/${id}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -154,10 +154,10 @@ export const getMovieDetails = async (id) => {
   }
 };
 
-//Récupère les avis liés à un film 
+//Récupère les avis liés à un film
 export const getAvisByFilm = async (filmId) => {
   try {
-    const response = await axios.get(`${API_URL}/avis/film/${filmId}`);
+    const response = await api.get(`/avis/film/${filmId}`);
     return response.data;
   } catch (error) {
     console.error("Erreur lors de la récupération des avis :", error);
@@ -165,10 +165,10 @@ export const getAvisByFilm = async (filmId) => {
   }
 };
 
-//Récupère les notes liés à un film 
+//Récupère les notes liés à un film
 export const getNotesByFilm = async (filmId) => {
   try {
-    const response = await axios.get(`${API_URL}/note/film/${filmId}`);
+    const response = await api.get(`/note/film/${filmId}`);
     return response.data;
   } catch (error) {
     if (error.response && error.response.status === 404) {
@@ -183,8 +183,8 @@ export const getNotesByFilm = async (filmId) => {
 //Ajoute un avis
 export const postAvis = async (contenu, utilisateurId, filmId) => {
   try {
-    await axios.post(
-      `${API_URL}/avis`,
+    await api.post(
+      `/avis`,
       {
         contenu,
         dateCreation: new Date(),
@@ -223,8 +223,8 @@ export const postNote = async (valeur, utilisateurId, filmId) => {
   });
 
   try {
-    await axios.post(
-      `${API_URL}/note`,
+    await api.post(
+      `/note`,
       {
         valeur: parseInt(valeur, 10),
         dateCreation: new Date().toISOString(),
@@ -246,8 +246,8 @@ export const postNote = async (valeur, utilisateurId, filmId) => {
 //Met à jour une note
 export const updateNote = async (noteId, valeur, utilisateurId, filmId) => {
   try {
-    await axios.put(
-      `${API_URL}/note/${noteId}`,
+    await api.put(
+      `/note/${noteId}`,
       {
         valeur: parseInt(valeur, 10),
         utilisateurId,
@@ -269,7 +269,7 @@ export const updateNote = async (noteId, valeur, utilisateurId, filmId) => {
 //Supprime une note
 export const deleteNote = async (noteId) => {
   try {
-    await axios.delete(`${API_URL}/note/${noteId}`, {
+    await api.delete(`/note/${noteId}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -282,8 +282,8 @@ export const deleteNote = async (noteId) => {
 //Met à jour un avis
 export const updateAvis = async (avisId, contenu, utilisateurId, filmId) => {
   try {
-    await axios.put(
-      `${API_URL}/avis/${avisId}`,
+    await api.put(
+      `/avis/${avisId}`,
       {
         contenu,
         utilisateurId,
@@ -306,7 +306,7 @@ export const updateAvis = async (avisId, contenu, utilisateurId, filmId) => {
 //Supprime un avis
 export const deleteAvis = async (avisId) => {
   try {
-    await axios.delete(`${API_URL}/avis/${avisId}`, {
+    await api.delete(`/avis/${avisId}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -319,8 +319,8 @@ export const deleteAvis = async (avisId) => {
 //Ajoute un film aux favoris d’un utilisateur
 export const ajouterFavoris = async (utilisateurId, filmId) => {
   try {
-    await axios.post(
-      `${API_URL}/favoris/ajouter`,
+    await api.post(
+      `/favoris/ajouter`,
       { utilisateurId, filmId },
       {
         headers: {
@@ -337,7 +337,7 @@ export const ajouterFavoris = async (utilisateurId, filmId) => {
 //Retire un film des favoris
 export const supprimerFavoris = async (utilisateurId, filmId) => {
   try {
-    await axios.delete(`${API_URL}/favoris/supprimer`, {
+    await api.delete(`/favoris/supprimer`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
         "Content-Type": "application/json",
@@ -352,7 +352,7 @@ export const supprimerFavoris = async (utilisateurId, filmId) => {
 //Récupère tous les favoris d'un utilisateur
 export const recupererFavoris = async () => {
   try {
-    const response = await axios.get(`${API_URL}/favoris/liste`);
+    const response = await api.get(`/favoris/liste`);
     return response.data;
   } catch (error) {
     console.error("Erreur lors de la récupération des favoris :", error);
@@ -363,8 +363,8 @@ export const recupererFavoris = async () => {
 //Récupère les avis liés à un utilisateur
 export const getAvisByUtilisateur = async (utilisateurId) => {
   try {
-    const response = await axios.get(
-      `${API_URL}/avis/utilisateur/${utilisateurId}`
+    const response = await api.get(
+      `/avis/utilisateur/${utilisateurId}`
     );
     return response.data;
   } catch (error) {
@@ -379,8 +379,8 @@ export const getAvisByUtilisateur = async (utilisateurId) => {
 //Récupère les notes liés à un utilisateur
 export const getNotesByUtilisateur = async (utilisateurId) => {
   try {
-    const response = await axios.get(
-      `${API_URL}/note/utilisateur/${utilisateurId}`
+    const response = await api.get(
+      `/note/utilisateur/${utilisateurId}`
     );
     return response.data;
   } catch (error) {
@@ -395,8 +395,8 @@ export const getNotesByUtilisateur = async (utilisateurId) => {
 //Récupère toutes les listes personnalisées d’un utilisateur
 export const getListesByUtilisateur = async (utilisateurId) => {
   try {
-    const response = await axios.get(
-      `http://localhost:5180/api/listeFilms/utilisateur/${utilisateurId}`
+    const response = await api.get(
+      `/listeFilms/utilisateur/${utilisateurId}`
     );
 
     for (const liste of response.data) {
@@ -419,8 +419,8 @@ export const getListesByUtilisateur = async (utilisateurId) => {
 // Crée une nouvelle liste
 export const createListe = async ({ titre, description, utilisateurId }) => {
   try {
-    await axios.post(
-      "http://localhost:5180/api/listeFilms",
+    await api.post(
+      "/listeFilms",
       {
         titre,
         description,
@@ -442,7 +442,7 @@ export const createListe = async ({ titre, description, utilisateurId }) => {
 //Met à jour une liste existante
 export const updateListe = async (listeId, data) => {
   try {
-    await axios.put(`${API_URL}/listeFilms/${listeId}`, data, {
+    await api.put(`/listeFilms/${listeId}`, data, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
         "Content-Type": "application/json",
@@ -456,7 +456,7 @@ export const updateListe = async (listeId, data) => {
 //Supprime une liste
 export const deleteListe = async (listeId) => {
   try {
-    await axios.delete(`${API_URL}/listeFilms/${listeId}`, {
+    await api.delete(`/listeFilms/${listeId}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -469,9 +469,9 @@ export const deleteListe = async (listeId) => {
 //Ajoute un film dans une liste
 export const ajouterFilm = async (listeId, filmId) => {
   try {
-    await axios.post(
-      `http://localhost:5180/api/listeFilms/${listeId}/ajouterFilm`,
-      JSON.stringify(filmId), 
+    await api.post(
+      `/listeFilms/${listeId}/ajouterFilm`,
+      JSON.stringify(filmId),
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -488,9 +488,9 @@ export const ajouterFilm = async (listeId, filmId) => {
 //Retire un film d'une liste
 export const supprimerFilm = async (listeId, filmId) => {
   try {
-    await axios.post(
-      `http://localhost:5180/api/listeFilms/${listeId}/supprimerFilm`,
-      JSON.stringify(filmId), // idem ici
+    await api.post(
+      `/listeFilms/${listeId}/supprimerFilm`,
+      JSON.stringify(filmId),
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
