@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cinemvBack", "cinemvBack\cinemvBack.csproj", "{B3750993-F694-2D7A-137A-32A70581FCEB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B3750993-F694-2D7A-137A-32A70581FCEB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3750993-F694-2D7A-137A-32A70581FCEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3750993-F694-2D7A-137A-32A70581FCEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3750993-F694-2D7A-137A-32A70581FCEB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0F033882-1FB5-4F0C-B8E9-4CC9CC025F25}
+	EndGlobalSection
+EndGlobal
