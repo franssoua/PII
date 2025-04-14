@@ -27,7 +27,7 @@ builder
             ClockSkew = TimeSpan.Zero,
         };
 
-        options.Events = new JwtBearerEvents // pas sur de garder à voir
+        options.Events = new JwtBearerEvents
         {
             OnChallenge = context =>
             {
@@ -51,7 +51,7 @@ builder.Services.AddCors(options =>
         policy =>
         {
             policy
-                .WithOrigins("http://localhost:3000") // Autorise le frontend
+                .WithOrigins("http://localhost:3000")
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .AllowCredentials();
@@ -64,7 +64,6 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "cinemvBack API", Version = "v1" });
 
-    // Ajout du bouton "Authorize" avec le schéma d'authentification JWT
     c.AddSecurityDefinition(
         "Bearer",
         new OpenApiSecurityScheme
@@ -100,11 +99,11 @@ builder.Services.AddDbContext<cinemvBackContext>(options => options.UseSqlite(co
 
 var app = builder.Build();
 
-// using (var scope = app.Services.CreateScope())
-// {
-//     var services = scope.ServiceProvider;
-//     SeedData.Init(services);
-// }
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    SeedData.Init(services);
+}
 
 if (app.Environment.IsDevelopment())
 {

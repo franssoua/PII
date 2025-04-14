@@ -14,10 +14,10 @@ public static class SeedData
             serviceProvider.GetRequiredService<DbContextOptions<cinemvBackContext>>()
         );
 
-        // if (context.Utilisateurs.Any() || context.ListesFilms.Any())
-        // {
-        //     return;
-        // }
+        if (context.Utilisateurs.Any() || context.ListesFilms.Any())
+        {
+            return;
+        }
 
         //Ajout d’éléments de la première classe
         Utilisateur utilisateur1 = new()
@@ -55,26 +55,38 @@ public static class SeedData
             Titre = "Films Marvel préférés",
             Description = "Liste des meilleurs Marvel.",
             UtilisateurId = utilisateur1.Id,
-            FilmsIds = new List<string> { "tt0111161", "tt0068646", "tt0468569" },
+            FilmsIds = new List<string> { "100402", "299536", "324857" },
         };
 
         ListeFilms liste2 = new()
         {
-            Titre = "Films à regarder",
-            Description = "Liste des films que je dois voir cette année.",
-            UtilisateurId = utilisateur2.Id,
-            FilmsIds = new List<string> { "tt1375666", "tt0816692", "tt4154796" },
-        };
-
-        ListeFilms liste3 = new()
-        {
             Titre = "Classiques",
             Description = "Liste des films que tout le monde devrait regarder.",
             UtilisateurId = utilisateur1.Id,
-            FilmsIds = new List<string> { "tt0050083", "tt0073486", "tt0038650" },
+            FilmsIds = new List<string> { "671", "313369", "11423" },
         };
 
-        context.ListesFilms.AddRange(liste1, liste2, liste3);
+        context.ListesFilms.AddRange(liste1, liste2);
+
+        context.SaveChanges();
+
+        Avis avis1 = new()
+        {
+            Contenu = "Vraiment très chouette",
+            DateCreation = DateTime.Parse("2025-03-21"),
+            UtilisateurId = utilisateur1.Id,
+            FilmId = "324857",
+        };
+
+        Avis avis2 = new()
+        {
+            Contenu = "J'ai pas trop aimé",
+            DateCreation = DateTime.Parse("2025-04-13"),
+            UtilisateurId = utilisateur1.Id,
+            FilmId = "950387",
+        };
+
+        context.Avis.AddRange(avis1, avis2);
 
         context.SaveChanges();
 
